@@ -1,0 +1,17 @@
+{
+  "name": "Portfolio Quest — Desert Oasis",
+  "short_name": "Portfolio Quest",
+  "description": "Portfólio interativo em 2D pixel art de Lucas Amaral.",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#241a16",
+  "theme_color": "#241a16",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    }
+  ]
+}
