@@ -718,7 +718,7 @@ export function PokemonBattle({
       <div className="battle-shell relative flex flex-col w-full max-w-[820px] aspect-[4/3] bg-[#1a1410] border-4 border-amber-600/80 rounded-sm shadow-[0_0_35px_rgba(0,0,0,0.9)] overflow-hidden">
         {/* Top Header with Opponent Selector, Team Builder Button & Close */}
         <div className="battle-toolbar flex items-center justify-between gap-2 px-3 py-1.5 bg-[#2a1e16] border-b-2 border-amber-500/40 text-[10px]">
-          <div className="flex items-center gap-2">
+          <div className="battle-toolbar-actions flex items-center gap-2 min-w-0">
             <span className="text-amber-400 font-bold tracking-wide pixel-font text-[9px]">
               ⚔️ ARENA DE BATALHA POKÉMON
             </span>
