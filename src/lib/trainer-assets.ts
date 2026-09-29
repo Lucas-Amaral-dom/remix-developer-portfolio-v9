@@ -77,6 +77,7 @@ export const TRAINER_VARIANT_BY_ID: Record<string, number> = {
 
   "Construtor do Workshop": 7,
   "Pesquisador de Campo": 7,
+  "Treinador da Praça": 0,
   "Arquiteto de Software": 7,
 
   "Mercador de Frutas e Itens": 8,
@@ -152,4 +153,14 @@ export const TRAINER_VARIANT_BY_OPPONENT_ID: Record<string, number> = {
   merchant: 8,
   bulbasaur: 10,
   chansey: 5,
+
+  // Lower-area trainers.
+  builder: 7,
+  tourist: 6,
+  "oasis-traveler": 1,
+  "square-trainer": 0,
+  explorer: 2,
+  artist: 4,
+  "field-researcher": 7,
+  "oasis-researcher": 10,
 };
