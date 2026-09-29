@@ -143,6 +143,19 @@
     border-color: var(--color-border);
   }
 
+  html,
+  body,
+  #root {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+  }
+
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -152,6 +165,9 @@
   canvas {
     image-rendering: pixelated;
     display: block;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
   }
 }
 
@@ -253,5 +269,150 @@
   a,
   summary {
     -webkit-tap-highlight-color: transparent;
+  }
+}
+
+
+/* Full-screen game presentation on touch devices in landscape. */
+.game-shell-root {
+  touch-action: none;
+}
+
+.game-shell-stage,
+.game-shell-stage > div,
+.game-shell-stage canvas {
+  touch-action: none;
+}
+
+.mobile-portrait-overlay {
+  display: none;
+}
+
+@media (max-width: 1024px) and (orientation: landscape) {
+  .game-shell-root {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .game-shell-header {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 60;
+    border: 0;
+    padding-top: max(5px, env(safe-area-inset-top));
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
+    padding-bottom: 5px;
+    background: linear-gradient(to bottom, oklch(0.12 0.03 40 / 0.8), transparent);
+    box-shadow: none;
+    backdrop-filter: none;
+    pointer-events: none;
+  }
+
+  .game-shell-header > div,
+  .game-shell-header button,
+  .game-shell-header summary {
+    pointer-events: auto;
+  }
+
+  .game-shell-header .game-shell-nav {
+    display: none;
+  }
+
+  .game-shell-stage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .game-shell-footer {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 55;
+    min-height: 0;
+    border: 0;
+    padding-top: 6px;
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    background: linear-gradient(to top, oklch(0.12 0.03 40 / 0.78), transparent);
+    box-shadow: none;
+    pointer-events: none;
+  }
+
+  .game-shell-footer > * {
+    pointer-events: auto;
+  }
+
+  .game-shell-footer .game-desktop-help {
+    display: none !important;
+  }
+
+  .game-footer-action-group {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .game-dpad {
+    gap: clamp(10px, 2vw, 24px);
+  }
+
+  .game-dpad-pad {
+    transform: scale(clamp(0.9, 1vw, 1.12));
+    transform-origin: bottom left;
+  }
+
+  .game-dpad-btn {
+    width: clamp(44px, 7vw, 58px);
+    height: clamp(44px, 7vw, 58px);
+  }
+
+  .game-dpad-action {
+    width: clamp(58px, 9vw, 72px);
+    height: clamp(58px, 9vw, 72px);
+    flex: 0 0 auto;
+  }
+
+  .game-shell-footer a,
+  .game-shell-footer button {
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 1024px) and (orientation: portrait) {
+  .mobile-portrait-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: oklch(0.08 0.02 40 / 0.96);
+    text-align: center;
+    backdrop-filter: none;
+  }
+
+  .mobile-portrait-card {
+    width: min(92vw, 360px);
+    padding: 22px 18px;
+    background: oklch(0.18 0.03 40);
+    color: white;
+    box-shadow:
+      0 0 0 4px var(--pixel-border-deep),
+      0 0 0 8px var(--pixel-border-light);
+  }
+}
+
+@media (max-width: 1024px) {
+  .game-shell-root button,
+  .game-shell-root a {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 }
