@@ -776,7 +776,7 @@ function World({
                 ⛶ Tentar modo jogo
               </button>
             </div>
-          </div>
+          </div>}
         </div>
 
       {!battleActive ? <footer className="game-shell-footer border-border shrink-0 flex flex-wrap items-center justify-between gap-2 border-t-4 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] bg-card/90 sm:gap-3 sm:px-3 sm:py-3">
