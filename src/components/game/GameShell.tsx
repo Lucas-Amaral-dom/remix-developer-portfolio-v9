@@ -861,6 +861,27 @@ function World({
   }
 }
 
+
+/* Fullscreen/expanded mode: keep controls translucent but clearly readable. */
+@media (min-width: 1025px), (max-width: 1024px) and (orientation: landscape) {
+  .game-shell-root .game-shell-header button,
+  .game-shell-root .game-shell-header summary,
+  .game-shell-root .game-shell-footer button,
+  .game-shell-root .mobile-quick-travel-btn {
+    background-color: rgba(20, 14, 12, 0.58) !important;
+    background-image: none !important;
+    border-color: rgba(251, 191, 36, 0.52) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.32) !important;
+    backdrop-filter: blur(2px);
+  }
+  .game-shell-root .game-shell-footer button:hover,
+  .game-shell-root .game-shell-header button:hover,
+  .game-shell-root .game-shell-header summary:hover,
+  .game-shell-root .mobile-quick-travel-btn:hover {
+    background-color: rgba(35, 24, 20, 0.72) !important;
+    border-color: rgba(251, 191, 36, 0.75) !important;
+  }
+}
 @media (max-width: 1024px) and (pointer: coarse) {
   .game-shell-stage {
     min-height: 0;
