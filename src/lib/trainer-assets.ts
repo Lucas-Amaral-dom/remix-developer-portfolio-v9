@@ -169,7 +169,7 @@ export const BATTLE_TRAINER_SPRITES_BY_VARIANT: Record<number, string> = {
 export const TRAINER_VARIANT_BY_OPPONENT_ID: Record<string, number> = {
   machop: TRAINER_ATLAS_VARIANT_BY_NAME.Brendan,
   psyduck: TRAINER_ATLAS_VARIANT_BY_NAME.Dawn,
-  trapinch: TRAINER_ATLAS_VARIANT_BY_NAME.Serena,
+  trapinch: TRAINER_ATLAS_VARIANT_BY_NAME.Ethan,
   charmander: TRAINER_ATLAS_VARIANT_BY_NAME.May,
   porygon: TRAINER_ATLAS_VARIANT_BY_NAME.Lucas,
   eevee: TRAINER_ATLAS_VARIANT_BY_NAME.Serena,
