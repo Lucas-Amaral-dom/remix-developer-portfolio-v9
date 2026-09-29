@@ -871,3 +871,15 @@
     padding: 4px;
   }
 }
+
+/* Battle actions are transparent too: sprites and battlefield remain readable. */
+.battle-shell button {
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+.battle-shell button:hover:not(:disabled),
+.battle-shell button:active:not(:disabled) {
+  background-color: oklch(1 0 0 / 0.08) !important;
+}
