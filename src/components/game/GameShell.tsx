@@ -448,6 +448,7 @@ function World({
   const dialogue = dialogueId ? dialogues[dialogueId] : undefined;
 
   const activeTransition = TRANSITIONS.find((t) => t.id === transitionType) ?? TRANSITIONS[0]!;
+  const battleActive = battleOpponent !== null || battleTransitionTarget !== null;
 
   return (
     <div
@@ -457,7 +458,7 @@ function World({
         if (target.closest("button,a,[role='button']")) e.preventDefault();
       }}
     >
-      <header className="game-shell-header shrink-0 border-b-4 border-[var(--pixel-border-deep)] bg-[oklch(0.27_0.045_38)] px-2 py-2 text-amber-50 shadow-lg backdrop-blur-sm sm:px-3">
+      {!battleActive && <header className="game-shell-header shrink-0 border-b-4 border-[var(--pixel-border-deep)] bg-[oklch(0.27_0.045_38)] px-2 py-2 text-amber-50 shadow-lg backdrop-blur-sm sm:px-3">
         <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-2">
           <div className="flex min-w-0 items-center justify-between gap-2">
             <h1 className="pixel-font min-w-0 truncate text-[10px] text-amber-100 sm:text-[11px]">
@@ -602,7 +603,7 @@ function World({
             </div>
           </nav>
         </div>
-      </header>
+      </header>}
       <div
         className={`game-shell-stage relative min-h-0 flex-1 overflow-hidden bg-[#241a16] ${
           isFullscreen || isMaximized ? "w-screen h-screen" : ""
@@ -731,7 +732,7 @@ function World({
           }}
         />
 
-          <div className="mobile-quick-travel" aria-label="Teleporte rápido para construções">
+          {!battleActive && <div className="mobile-quick-travel" aria-label="Teleporte rápido para construções">
             {[
               ["home", "🏠", "Casa"],
               ["lab", "🧪", "Lab"],
@@ -749,7 +750,7 @@ function World({
                 <span>{label}</span>
               </button>
             ))}
-          </div>
+          </div>}
 
           {isPortraitMobile && <div className="mobile-portrait-overlay" role="status" aria-live="polite">
             <div className="mobile-portrait-card">
@@ -778,7 +779,7 @@ function World({
           </div>
         </div>
 
-      <footer className="game-shell-footer border-border shrink-0 flex flex-wrap items-center justify-between gap-2 border-t-4 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] bg-card/90 sm:gap-3 sm:px-3 sm:py-3">
+      {!battleActive && <footer className="game-shell-footer border-border shrink-0 flex flex-wrap items-center justify-between gap-2 border-t-4 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] bg-card/90 sm:gap-3 sm:px-3 sm:py-3">
         <DPad
           onDir={(d: Dir | null) => gameRef.current?.setDir(d)}
           onAction={() => (dialogue ? undefined : gameRef.current?.interact())}
@@ -825,7 +826,7 @@ function World({
             </Link>
           </div>
         )}
-      </footer>
+      </footer>}
     </div>
   );
 }
