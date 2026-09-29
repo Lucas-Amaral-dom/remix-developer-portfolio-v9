@@ -171,20 +171,16 @@ const SPRITES: Record<string, string> = {
 // from being shown when an NPC changes direction.
 const TRAINER_DIR_INDEX: Record<Dir, number> = { down: 0, left: 1, right: 2, up: 3 };
 const TRAINER_FRAMES_PER_DIRECTION = 4;
-// characters.png is 32x1536 and stores 12 trainers × 4 directions × 4 frames.
-// The Lucas block is the 6th block (rows 20–23), i.e. zero-based variant 5.
-// Keep this explicit so a 1-based "position 5" can never accidentally select Dawn.
-const PLAYER_LUCAS_VARIANT = 5;
-const PLAYER_LUCAS_FIRST_ROW = PLAYER_LUCAS_VARIANT * 4;
+// characters.png is 128x2304 and contains 12 trainer blocks.
+// Each block is 4 direction rows × 4 walking frames.
+// The Lucas standalone asset is only 32x48 (one pose), so the protagonist uses
+// Red (the first, fully animated block) as the stable fallback requested for the demo.
+const PLAYER_TRAINER_VARIANT = 0;
 const WALK_ANIMATION_FPS = 8;
 
 const trainerFrame = (variant: number, dir: Dir, walkFrame = 0) =>
   ((Math.abs(variant) % TRAINER_VARIANTS) * 4 + TRAINER_DIR_INDEX[dir]) *
     TRAINER_FRAMES_PER_DIRECTION +
-  (Math.abs(walkFrame) % TRAINER_FRAMES_PER_DIRECTION);
-
-const playerLucasFrame = (dir: Dir, walkFrame = 0) =>
-  (PLAYER_LUCAS_FIRST_ROW + TRAINER_DIR_INDEX[dir]) * TRAINER_FRAMES_PER_DIRECTION +
   (Math.abs(walkFrame) % TRAINER_FRAMES_PER_DIRECTION);
 
 const npcTrainerVariant = (id: number, npcId?: string) =>
@@ -1272,7 +1268,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
   function makePlayer(pos: { x: number; y: number }, initialFacing: Dir = "down") {
     const p = k.add([
-      k.sprite("trainer-chars", { frame: playerLucasFrame(initialFacing, 0) }),
+      k.sprite("trainer-chars", { frame: trainerFrame(PLAYER_TRAINER_VARIANT, initialFacing, 0) }),
       k.pos(pos.x * TILE + TILE / 2, pos.y * TILE + TILE),
       k.anchor("bot"),
       k.scale(1.0),
@@ -1980,16 +1976,16 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           player.walkAnimTime += k.dt();
           const walkFrame = Math.floor(player.walkAnimTime * WALK_ANIMATION_FPS) % 4;
           player.step = walkFrame;
-          player.frame = playerLucasFrame(player.facing, walkFrame);
+          player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, walkFrame);
         } else {
           player.walkAnimTime = 0;
           player.step = 0;
-          player.frame = playerLucasFrame(player.facing, 0);
+          player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, 0);
         }
       } else {
         player.walkAnimTime = 0;
         player.step = 0;
-        player.frame = playerLucasFrame(player.facing, 0);
+        player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, 0);
       }
 
       // Check nearest interaction or door
@@ -2156,7 +2152,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         doorObj.apply(1);
         if (activePlayer) {
           activePlayer.facing = "up";
-          activePlayer.frame = playerLucasFrame("up", 0);
+          activePlayer.frame = trainerFrame(PLAYER_TRAINER_VARIANT, "up", 0);
           setPosX(activePlayer, doorObj.x * TILE + TILE / 2);
           setPosY(activePlayer, doorObj.y * TILE + 2);
         }
