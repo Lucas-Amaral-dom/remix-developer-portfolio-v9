@@ -1641,7 +1641,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       // old walking/idle switch to leave a visible duplicate or halo.
       const spr = k.add([
         k.sprite("trainer-chars", {
-          // Nurse Joy is the Dawn block from characters.png: position 5 (index 4).
+          // Nurse Joy is the Dawn block from characters.png: position 6 (index 5).
           frame: trainerFrame(isNurseJoy ? 5 : trainerVariant, isNurseJoy ? "down" : face, 0),
         }),
         k.pos(px, py),
