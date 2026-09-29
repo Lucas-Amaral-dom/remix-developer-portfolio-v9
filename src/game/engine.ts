@@ -1776,7 +1776,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
               if (
                 distFromHome <= 1.8 &&
-                !isRoamingBlocked(nextCol, nextRow) &&
+                !isRoamingBlocked(scene, rows, nextCol, nextRow) &&
                 !occupiedByOtherPokemon
               ) {
                 p.state = "walking";
@@ -1870,7 +1870,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
               if (
                 distFromHome <= 2.2 &&
-                !isRoamingBlocked(nextCol, nextRow) &&
+                !isRoamingBlocked(scene, rows, nextCol, nextRow) &&
                 !nearPlayer &&
                 !occupiedByOther
               ) {
