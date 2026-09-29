@@ -2170,21 +2170,38 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         cb.onPrompt(best ? { label: best.label, action: best.action } : null);
       }
 
-      // Smooth follow with proper map-boundary clamping.
-      // This avoids the "camera stuck" feeling while keeping the player readable
-      // near the center and preventing the camera from exposing void space.
+      // Mobile-friendly camera: keep a small dead-zone around the trainer so
+      // walking does not make the whole map constantly slide. Once the player
+      // reaches the edge of that zone, the camera follows smoothly and remains
+      // clamped to the actual map bounds.
       const halfW = k.width() / 2;
       const halfH = k.height() / 2;
-      const targetCx =
-        mapW * TILE <= k.width()
-          ? (mapW * TILE) / 2
-          : Math.min(Math.max(player.pos.x, halfW), mapW * TILE - halfW);
-      const targetCy =
-        mapH * TILE <= k.height()
-          ? (mapH * TILE) / 2
-          : Math.min(Math.max(player.pos.y, halfH), mapH * TILE - halfH);
+      const touchLayout =
+        typeof window !== "undefined" &&
+        window.matchMedia("(max-width: 1024px) and (pointer: coarse)").matches;
+      const deadZoneX = k.width() * (touchLayout ? 0.20 : 0.15);
+      const deadZoneY = k.height() * (touchLayout ? 0.18 : 0.14);
 
-      const follow = Math.min(1, k.dt() * 12);
+      let targetCx = cameraX;
+      let targetCy = cameraY;
+      if (player.pos.x < cameraX - deadZoneX) targetCx = player.pos.x + deadZoneX;
+      if (player.pos.x > cameraX + deadZoneX) targetCx = player.pos.x - deadZoneX;
+      if (player.pos.y < cameraY - deadZoneY) targetCy = player.pos.y + deadZoneY;
+      if (player.pos.y > cameraY + deadZoneY) targetCy = player.pos.y - deadZoneY;
+
+      if (mapW * TILE <= k.width()) {
+        targetCx = (mapW * TILE) / 2;
+      } else {
+        targetCx = Math.min(Math.max(targetCx, halfW), mapW * TILE - halfW);
+      }
+
+      if (mapH * TILE <= k.height()) {
+        targetCy = (mapH * TILE) / 2;
+      } else {
+        targetCy = Math.min(Math.max(targetCy, halfH), mapH * TILE - halfH);
+      }
+
+      const follow = Math.min(1, k.dt() * (touchLayout ? 14 : 12));
       cameraX += (targetCx - cameraX) * follow;
       cameraY += (targetCy - cameraY) * follow;
       k.setCamPos(Math.round(cameraX), Math.round(cameraY));
