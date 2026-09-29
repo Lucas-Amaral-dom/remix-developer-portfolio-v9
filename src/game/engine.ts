@@ -330,6 +330,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   const waterfallVisuals: WaterfallVisual[] = [];
   const fireVisuals: FireVisual[] = [];
   let waterTick = 0;
+  const visualAnimationInterval = 1 / 15;
   let activeInteriorStyleKey: Exclude<SceneId, "city"> = "home";
 
   const INTERIOR_STYLES: Record<
@@ -1372,7 +1373,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   // Water still animates, but at a capped 30 FPS to keep the overworld responsive.
   k.onUpdate(() => {
     waterTick += k.dt();
-    if (waterTick < 1 / 24) return;
+    if (waterTick < (touchLayout ? visualAnimationInterval : 1 / 24)) return;
     waterTick = 0;
     const time = k.time();
     for (const visual of waterVisuals) {
@@ -1760,27 +1761,31 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     ]) as unknown as { pos: { x: number; y: number } };
 
     const SPEED = 120;
+    const aiInterval = touchLayout ? 1 / 12 : 1 / 20;
+    const depthInterval = touchLayout ? 1 / 20 : 1 / 30;
+    const activeRadiusTiles = touchLayout ? 12 : Number.POSITIVE_INFINITY;
     let aiTick = 0;
     let depthTick = 0;
+    const pokemonOccupancy = new Set<string>();
+    const npcOccupancy = new Set<string>();
 
     k.onUpdate(() => {
       const dt = k.dt();
       const now = k.time();
       aiTick += dt;
       depthTick += dt;
-      const runAiStep = aiTick >= 1 / 20;
-      if (runAiStep) aiTick = 0;
+      const runAiStep = aiTick >= aiInterval;
+      if (runAiStep) aiTick -= aiInterval;
       // Keep player shadow aligned under feet
       setPosX(playerShadow, player.pos.x);
       setPosY(playerShadow, player.pos.y - 2);
 
       // Dynamic Y-depth sorting so characters and player never clip through roofs, walls or each other
-      if (depthTick >= 1 / 30) {
-        depthTick = 0;
+      if (depthTick >= depthInterval) {
+        depthTick -= depthInterval;
         player.z = 20 + Math.floor(player.pos.y / 8);
-        for (const npc of activeNpcs) {
-          npc.spr.z = 20 + Math.floor(npc.spr.pos.y / 8);
-        }
+        for (const npc of activeNpcs) npc.spr.z = 20 + Math.floor(npc.spr.pos.y / 8);
+        for (const p of activePokemon) p.spr.z = 20 + Math.floor(p.spr.pos.y / 8);
       }
 
       // Doors slide open smoothly when near
@@ -1792,15 +1797,27 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         d.apply(d.open);
       }
 
+      if (runAiStep) {
+        pokemonOccupancy.clear();
+        for (const other of activePokemon) pokemonOccupancy.add(other.curCol + "," + other.curRow);
+        npcOccupancy.clear();
+        for (const other of activeNpcs) {
+          npcOccupancy.add(other.curCol + "," + other.curRow);
+          if (other.state === "walking") npcOccupancy.add(Math.round((other.targetX - TILE / 2) / TILE) + "," + Math.round((other.targetY - (TILE - 2)) / TILE));
+        }
+      }
+
       // Update active roaming Pokémon with walking and trot animations
       for (const p of activePokemon) {
         if (state.paused || p.state === "talking") continue;
+        const pDistance = Math.max(Math.abs(p.curCol - Math.floor(player.pos.x / TILE)), Math.abs(p.curRow - Math.floor(player.pos.y / TILE)));
+        if (touchLayout && pDistance > activeRadiusTiles && p.state === "idle") continue;
 
         p.spr.z = 20 + Math.floor(p.spr.pos.y / 8);
 
         if (p.state === "idle") {
           if (!runAiStep) continue;
-          p.idleTimer -= 1 / 20;
+          p.idleTimer -= aiInterval;
           // Gentle breathing idle
           const t = now;
           setScaleY(p.spr, p.baseScale + Math.sin(t * 3.5 + p.curCol) * 0.04);
@@ -1829,11 +1846,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
                   const dist = Math.hypot(col - p.homeCol, row - p.homeRow);
                   return dist <= 1.8 && !roamingBlocked(col, row);
                 })
-                .filter(({ col, row }) =>
-                  !activePokemon.some(
-                    (other) => other !== p && other.curCol === col && other.curRow === row,
-                  ),
-                );
+                .filter(({ col, row }) => !pokemonOccupancy.has(col + "," + row));
               const candidate = candidates.length
                 ? candidates[Math.floor(Math.random() * candidates.length)]!
                 : null;
@@ -1886,6 +1899,8 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       // Update active NPCs with authentic Pokemon movement AI
       for (const npc of activeNpcs) {
         if (state.paused || npc.state === "talking") continue;
+        const npcDistance = Math.max(Math.abs(npc.curCol - Math.floor(player.pos.x / TILE)), Math.abs(npc.curRow - Math.floor(player.pos.y / TILE)));
+        if (touchLayout && npcDistance > activeRadiusTiles && npc.state === "idle") continue;
 
         // Nurse Joy uses the actual Dawn overworld block from characters.png:
         // the 6th physical block (zero-based index 5), not the yellow-hat block at index 4.
@@ -1900,7 +1915,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           setPosY(npc.shadow, npc.curRow * TILE + TILE - 2);
           // Idle sprites only change frame when direction/state changes. Rewriting
           // the frame and opacity every animation tick created unnecessary work.
-          npc.idleTimer -= 1 / 20;
+          npc.idleTimer -= aiInterval;
 
           if (npc.idleTimer <= 0) {
             const dirs: Dir[] = ["down", "left", "right", "up"];
@@ -1925,14 +1940,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
                   const pTileX = Math.floor(player.pos.x / TILE);
                   const pTileY = Math.floor(player.pos.y / TILE);
                   if (col === pTileX && row === pTileY) return false;
-                  return !activeNpcs.some(
-                    (other) =>
-                      other !== npc &&
-                      ((other.curCol === col && other.curRow === row) ||
-                        (other.state === "walking" &&
-                          Math.round((other.targetX - TILE / 2) / TILE) === col &&
-                          Math.round((other.targetY - (TILE - 2)) / TILE) === row)),
-                  );
+                  return !npcOccupancy.has(col + "," + row);
                 });
               const candidate = candidates.length
                 ? candidates[Math.floor(Math.random() * candidates.length)]!
