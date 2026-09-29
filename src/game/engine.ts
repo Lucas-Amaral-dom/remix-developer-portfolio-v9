@@ -24,6 +24,7 @@ import townBluehallSprite from "@/assets/build-town-bluehall.png";
 import townPinkcottageSprite from "@/assets/build-town-pinkcottage.png";
 import townOrangecottageSprite from "@/assets/build-town-orangecottage.png";
 import trainerOverworldAtlas from "@/assets/characters.png";
+import overworldCynthia from "@/assets/trainers/overworld/cynthia.png";
 import doorModernSprite from "@/assets/door-modern.png";
 import doorWoodSprite from "@/assets/door-wood.png";
 import desertSandTile from "@/assets/tiles/desert-sand.png";
@@ -256,6 +257,10 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
   for (const [name, src] of Object.entries(SPRITES)) k.loadSprite(name, src);
   k.loadSprite("trainer-chars", trainerOverworldAtlas, { sliceX: 4, sliceY: TRAINER_VARIANTS * 4 });
+  // Cynthia has a dedicated overworld PNG. Use it directly for the Arena judge
+  // instead of relying on the legacy characters.png atlas, whose corresponding
+  // block can differ from the intended Cynthia artwork.
+  k.loadSprite("trainer-cynthia-world", overworldCynthia);
   k.loadSprite("door-modern", doorModernSprite);
   k.loadSprite("door-wood", doorWoodSprite);
   k.loadSprite("terrain-sand", desertSandTile);
@@ -949,6 +954,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   interface ActiveNpc {
     item: Interactable;
     trainerVariant: number;
+    standaloneWorldSprite: boolean;
     facing: Dir;
     homeCol: number;
     homeRow: number;
@@ -1640,9 +1646,9 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       // One visual instance only: using two overlapping sprites caused the
       // old walking/idle switch to leave a visible duplicate or halo.
       const spr = k.add([
-        k.sprite("trainer-chars", {
+        k.sprite(standaloneWorldSprite ? "trainer-cynthia-world" : "trainer-chars", {
           // Nurse Joy is the Dawn block from characters.png: position 6 (index 5).
-          frame: trainerFrame(isNurseJoy ? 5 : trainerVariant, isNurseJoy ? "down" : face, 0),
+          frame: standaloneWorldSprite ? 0 : trainerFrame(isNurseJoy ? 5 : trainerVariant, isNurseJoy ? "down" : face, 0),
         }),
         k.pos(px, py),
         k.anchor("bot"),
@@ -1662,6 +1668,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       activeNpcs.push({
         item,
         trainerVariant,
+        standaloneWorldSprite,
         facing: face,
         homeCol: item.x,
         homeRow: item.y,
@@ -1838,7 +1845,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
             if (!npc.canWander || Math.random() < 0.25) {
               // Turn first, then resolve the correct row in the trainer atlas.
               npc.facing = dirs[Math.floor(Math.random() * dirs.length)]!;
-              npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, 0);
+              npc.spr.frame = npc.standaloneWorldSprite ? 0 : trainerFrame(npc.trainerVariant, npc.facing, 0);
               npc.idleTimer = 0.7 + Math.random() * 1.1;
             } else {
               // Choose a step to walk
@@ -1892,7 +1899,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           // Use a fixed animation clock so every direction, especially up/down,
           // begins stepping on the first rendered frames of the movement.
           const walkFrame = Math.floor(npc.walkAnimTime * WALK_ANIMATION_FPS) % 4;
-          npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, walkFrame);
+          npc.spr.frame = npc.standaloneWorldSprite ? 0 : trainerFrame(npc.trainerVariant, npc.facing, walkFrame);
           npc.spr.opacity = 1;
           const stepPhase = walkFrame;
 
@@ -2074,10 +2081,9 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
                     matchedNpc.facing = diffY > 0 ? "down" : "up";
                   }
                   if (matchedNpc.item.label !== "Enfermeira Joy") {
-                    matchedNpc.spr.frame = trainerFrame(
-                      matchedNpc.trainerVariant,
-                      matchedNpc.facing,
-                    );
+                    matchedNpc.spr.frame = matchedNpc.standaloneWorldSprite
+                      ? 0
+                      : trainerFrame(matchedNpc.trainerVariant, matchedNpc.facing);
                   }
                   matchedNpc.emote.opacity = 1;
                   k.wait(0.8, () => {
