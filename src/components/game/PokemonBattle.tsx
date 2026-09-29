@@ -802,19 +802,19 @@ export function PokemonBattle({
               Fixed: The Pokémon sprite rests DIRECTLY ON TOP of the shadow pedestal,
               never below it!
           ══════════════════════════════════════════════════════════════════════════ */}
-          <div className="absolute top-6 right-6 md:right-12 w-56 h-48 flex items-end justify-center pointer-events-none">
+          <div className="absolute top-4 right-1 sm:top-6 sm:right-6 md:right-12 w-64 h-52 sm:w-56 sm:h-48 flex items-end justify-center pointer-events-none">
             {/* Sand Shadow Pedestal */}
-            <div className="absolute bottom-2 w-48 h-14 rounded-[50%] bg-[#5c462b]/90 border-2 border-[#937146] shadow-md z-0" />
+            <div className="absolute bottom-1 w-56 h-14 sm:w-48 rounded-[50%] bg-[#5c462b]/90 border-2 border-[#937146] shadow-md z-0" />
 
             {/* Feet contact shadow */}
             <div className="absolute bottom-5 w-24 h-5 rounded-[50%] bg-black/40 blur-[1px] z-5 pointer-events-none" />
 
             {/* Opponent Sprite - Resting squarely ON TOP of the shadow pedestal center */}
-            <div className="relative z-10 bottom-6 flex items-end justify-center">
+            <div className="relative z-10 bottom-4 sm:bottom-6 flex items-end justify-center">
               <img
                 src={currentOpponent.sprite}
                 alt={currentOpponent.name}
-                className={`w-32 h-32 md:w-36 md:h-36 object-contain filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.4)] transition-all duration-200 image-pixelated ${
+                className={`w-44 h-44 sm:w-36 sm:h-36 md:w-40 md:h-40 object-contain filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.4)] transition-all duration-200 image-pixelated ${
                   animOpponentHit ? "animate-[shake_0.15s_ease-in-out_2] brightness-200" : ""
                 } ${animOpponentAttack ? "translate-x-[-25px] translate-y-[20px] scale-110" : "animate-[bounce_2s_ease-in-out_infinite]"}`}
                 style={{ imageRendering: "pixelated" }}
@@ -1328,7 +1328,7 @@ export function PokemonBattle({
   .battle-shell { border-width: 3px; }
   .battle-toolbar { min-height: 48px; }
   .battle-toolbar-actions { gap: 6px; }
-  .battle-stage { min-height: 0; }
+  .battle-stage { min-height: 0; }\n  .battle-stage .battle-opponent-focus { min-height: 0; }\n  .battle-stage .battle-opponent-status { transform: scale(0.94); transform-origin: top left; }
   .battle-controls { min-height: 166px !important; height: 166px !important; padding: 8px !important; }
   .battle-controls button { min-height: 48px; font-size: 11px; }
 }
