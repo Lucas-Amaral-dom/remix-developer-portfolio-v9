@@ -28,7 +28,7 @@ export class TransitionManager {
   private activeType: TransitionType = "iris";
   public isRunning: boolean = false;
 
-  constructor(container: HTMLElement, width = 960, height = 704) {
+  constructor(container: HTMLElement, width = 960, height = 540) {
     this.canvas = document.createElement("canvas");
     this.canvas.width = width;
     this.canvas.height = height;
