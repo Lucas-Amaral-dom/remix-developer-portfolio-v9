@@ -1054,10 +1054,10 @@ export const SCENES: Record<SceneId, SceneDef> = {
       { x: 6, y: 3, kind: "counter", label: "Balcão de Contato", dialogue: "contact-form" },
       {
         x: 6,
-        y: 2,
+        y: 4,
         kind: "npc",
         npc: 1,
-        face: "down",
+        face: "up",
         label: "Atendente",
         dialogue: "contact-intro",
       },

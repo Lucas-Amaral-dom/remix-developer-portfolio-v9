@@ -2293,6 +2293,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
   function goTo(id: SceneId) {
     if (state.transitioning) return;
+    const previousSceneId = currentSceneId;
     state.transitioning = true;
     state.dir = null;
     state.lastPromptKey = "";
@@ -2343,8 +2344,19 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       type: currentTransitionType,
       origin,
       onMidpoint: () => {
-        currentSceneId = id;
-        k.go("play", { id, spawn, initialFacing });
+        try {
+          currentSceneId = id;
+          k.go("play", { id, spawn, initialFacing });
+        } catch (error) {
+          console.error("Failed to enter scene:", id, error);
+          currentSceneId = previousSceneId;
+          try {
+            const previousScene = SCENES[previousSceneId];
+            k.go("play", { id: previousSceneId, spawn: previousScene.spawn, initialFacing: previousSceneId === "city" ? "down" : "up" });
+          } catch (restoreError) {
+            console.error("Failed to restore previous scene:", restoreError);
+          }
+        }
       },
       getNewOrigin: () => {
         try {
@@ -2358,7 +2370,10 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       },
       onComplete: () => {
         state.transitioning = false;
-        cb.onTransitionComplete?.(target);
+        state.dir = null;
+        state.lastPromptKey = "";
+        cb.onPrompt(null);
+        cb.onTransitionComplete?.(SCENES[currentSceneId]);
       },
     });
   }
