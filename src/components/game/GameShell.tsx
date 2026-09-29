@@ -794,7 +794,7 @@ function World({
           )}
         </div>
 
-      {!battleActive ? <footer className="game-shell-footer border-border shrink-0 flex flex-wrap items-center justify-between gap-2 border-t-4 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] bg-card/90 sm:gap-3 sm:px-3 sm:py-3">
+      {!battleActive ? <footer className={`game-shell-footer border-border shrink-0 flex flex-wrap items-center justify-between gap-2 border-t-4 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] bg-card/90 sm:gap-3 sm:px-3 sm:py-3 ${isFullscreen || isMaximized ? "game-shell-footer-expanded" : ""}`}>
         <DPad
           onDir={(d: Dir | null) => gameRef.current?.setDir(d)}
           onAction={() => (dialogue ? undefined : gameRef.current?.interact())}
@@ -968,6 +968,16 @@ function World({
   }
 }
 @media (min-width: 1025px) {
+  .game-shell-footer-expanded {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    z-index: 100 !important;
+    margin: 0 !important;
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
+  }
   .game-dialogue-layer {
     position: absolute;
     inset: 0;
