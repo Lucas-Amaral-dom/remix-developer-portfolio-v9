@@ -435,7 +435,13 @@ function World({
   const activeTransition = TRANSITIONS.find((t) => t.id === transitionType) ?? TRANSITIONS[0]!;
 
   return (
-    <div className="game-shell-root relative flex h-dvh min-h-dvh flex-col overflow-hidden">
+    <div
+      className="game-shell-root relative flex h-dvh min-h-dvh flex-col overflow-hidden"
+      onContextMenu={(e) => {
+        const target = e.target as HTMLElement;
+        if (target.closest("button,a,[role='button']")) e.preventDefault();
+      }}
+    >
       <header className="game-shell-header shrink-0 border-b-4 border-[var(--pixel-border-deep)] bg-[oklch(0.27_0.045_38)] px-2 py-2 text-amber-50 shadow-lg backdrop-blur-sm sm:px-3">
         <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-2">
           <div className="flex min-w-0 items-center justify-between gap-2">
@@ -773,10 +779,17 @@ function World({
         </div>
         {scene?.indoor ? (
           <div className="game-footer-action-group flex gap-2">
-            <PixelButton onClick={() => setScreen(scene.id as Exclude<SceneId, "city">)}>
+            <PixelButton
+              className="select-none touch-manipulation"
+              onClick={() => setScreen(scene.id as Exclude<SceneId, "city">)}
+            >
               Ver dados
             </PixelButton>
-            <PixelButton variant="secondary" onClick={() => gameRef.current?.goTo("city")}>
+            <PixelButton
+              variant="secondary"
+              className="select-none touch-manipulation"
+              onClick={() => gameRef.current?.goTo("city")}
+            >
               ← Sair pra Cidade
             </PixelButton>
           </div>
