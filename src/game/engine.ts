@@ -850,6 +850,31 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         k.color(style.wallLine[0], style.wallLine[1], style.wallLine[2]),
         k.z(3),
       ]);
+
+      // Small upper-wall windows make interiors read like rooms rather than
+      // flat colored boxes. They use the current room palette, so each scene
+      // keeps its own identity without importing another tileset.
+      if (row === 1 && (col === 4 || col === 9 || col === 14)) {
+        k.add([
+          k.rect(TILE - 6, 16, { radius: 1 }),
+          k.pos(px + 3, py + 8),
+          k.color(style.wallLine[0], style.wallLine[1], style.wallLine[2]),
+          k.z(4),
+        ]);
+        k.add([
+          k.rect(TILE - 10, 12, { radius: 1 }),
+          k.pos(px + 5, py + 10),
+          k.color(style.floor[0], style.floor[1], style.floor[2]),
+          k.opacity(0.72),
+          k.z(5),
+        ]);
+        k.add([
+          k.rect(2, 12),
+          k.pos(px + 15, py + 10),
+          k.color(style.trim[0], style.trim[1], style.trim[2]),
+          k.z(6),
+        ]);
+      }
     }
 
     if (ch === "q" || ch === "i") {
@@ -878,6 +903,26 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         k.opacity(0.18),
         k.z(2),
       ]);
+
+      // Sparse plank/tile seams give the floor the handcrafted look of the
+      // reference while remaining cheap: two tiny primitives per tile.
+      if (ch === "i") {
+        k.add([
+          k.rect(TILE - 8, 1),
+          k.pos(px + 4, py + 14),
+          k.color(style.trim[0], style.trim[1], style.trim[2]),
+          k.opacity(0.18),
+          k.z(2),
+        ]);
+      } else {
+        k.add([
+          k.rect(TILE - 8, 1),
+          k.pos(px + 4, py + 14),
+          k.color(style.trim[0], style.trim[1], style.trim[2]),
+          k.opacity(0.12),
+          k.z(2),
+        ]);
+      }
     }
     // Authentic indoor exit threshold & exterior sunlight spill (tile 'E')
     if (ch === "E") {

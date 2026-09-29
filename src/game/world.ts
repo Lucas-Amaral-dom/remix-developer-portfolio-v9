@@ -893,85 +893,87 @@ function buildInterior(
   interactables: Interactable[],
   hint: string,
 ): SceneDef {
-  // Larger rooms give the interiors enough space for functional furniture clusters,
-  // circulation and real door approaches instead of the old 13×9 empty box.
-  const w = 15;
-  const h = 11;
+  // Wider rooms keep furniture on the perimeter and a clear central circulation
+  // path, following the composition of the reference interior while preserving
+  // the project's simple pixel-art language.
+  const w = 19;
+  const h = 13;
   const g = makeGrid(w, h, ".");
   border(g, "V");
-  fillRect(g, 1, 1, w - 2, 1, "V");
-  fillRect(g, 1, 2, w - 2, h - 3, ".");
+
+  // Double-height back wall and side columns create a real room silhouette,
+  // instead of the old flat rectangle.
+  fillRect(g, 1, 1, w - 2, 2, "V");
+  fillRect(g, 1, 3, 1, h - 5, "V");
+  fillRect(g, w - 2, 3, 1, h - 5, "V");
 
   const floorByScene: Record<SceneId, string> = {
     city: ".",
     home: "i",
     lab: "q",
-    arena: "r",
+    arena: "q",
     shop: "i",
     inn: "i",
     workshop: "q",
     pokecenter: "q",
     credits: "i",
   };
-  const floor = floorByScene[id];
-  fillRect(g, 1, 2, w - 2, h - 3, floor);
+  const floor = floorByScene[id] ?? ".";
+  fillRect(g, 2, 3, w - 4, h - 5, floor);
 
-  // Real room-planning rhythm: perimeter trim, a central circulation aisle,
-  // and scene-specific carpet/floor zones rather than a checkerboard.
-  for (let x = 1; x < w - 1; x++) {
-    set(g, x, 2, "V");
-    set(g, x, h - 2, "r");
-  }
-  for (let y = 3; y < h - 2; y++) {
-    set(g, 2, y, "V");
-    set(g, w - 3, y, "V");
-  }
-  fillRect(g, 6, 4, 3, 4, floor === "q" ? "r" : "q");
+  // Light floor variation replaces the repetitive checkerboard look with broad
+  // zones that read as wood, tile, carpet and walkable circulation.
+  const alternate = floor === "q" ? "i" : "q";
+  fillRect(g, 3, 4, 3, h - 7, alternate);
+  fillRect(g, w - 6, 4, 3, h - 7, alternate);
 
+  // Central circulation aisle stays deliberately open.
+  fillRect(g, 7, 4, 5, h - 7, floor);
+  fillRect(g, 8, 5, 3, 4, floor);
+
+  // Scene-specific carpet / flooring identity.
   if (id === "home") {
-    fillRect(g, 3, 3, 3, 2, "i");
-    fillRect(g, 9, 3, 3, 2, "i");
-    fillRect(g, 4, 7, 7, 1, "r");
+    fillRect(g, 6, 7, 7, 2, "r");
+    fillRect(g, 3, 4, 3, 2, "i");
+    fillRect(g, 13, 4, 3, 2, "i");
   } else if (id === "lab") {
-    fillRect(g, 3, 3, 9, 1, "V");
-    fillRect(g, 3, 7, 9, 1, "r");
-  } else if (id === "pokecenter") {
-    fillRect(g, 4, 3, 7, 1, "V");
-    fillRect(g, 4, 7, 7, 1, "r");
+    fillRect(g, 4, 4, 11, 1, "V");
+    fillRect(g, 6, 8, 7, 2, "r");
   } else if (id === "arena") {
-    fillRect(g, 4, 4, 7, 3, "r");
-    set(g, 7, 5, "q");
+    fillRect(g, 5, 5, 9, 4, "r");
+    set(g, 9, 6, "q");
   } else if (id === "shop") {
-    fillRect(g, 3, 3, 9, 1, "i");
-    fillRect(g, 3, 7, 9, 1, "r");
+    fillRect(g, 5, 4, 9, 2, "i");
+    fillRect(g, 6, 8, 7, 2, "r");
   } else if (id === "inn") {
-    fillRect(g, 3, 4, 3, 3, "i");
-    fillRect(g, 9, 4, 3, 3, "i");
-    fillRect(g, 6, 8, 3, 1, "r");
+    fillRect(g, 3, 4, 4, 3, "i");
+    fillRect(g, 12, 4, 4, 3, "i");
+    fillRect(g, 7, 8, 5, 2, "r");
   } else if (id === "workshop") {
-    fillRect(g, 3, 3, 9, 1, "V");
-    fillRect(g, 3, 7, 3, 1, "r");
-    fillRect(g, 9, 7, 3, 1, "r");
+    fillRect(g, 4, 4, 4, 2, "V");
+    fillRect(g, 11, 4, 4, 2, "V");
+    fillRect(g, 6, 8, 7, 2, "r");
+  } else if (id === "pokecenter") {
+    fillRect(g, 5, 4, 9, 2, "V");
+    fillRect(g, 6, 8, 7, 2, "r");
   } else if (id === "credits") {
-    fillRect(g, 3, 3, 9, 1, "V");
-    fillRect(g, 3, 5, 3, 3, "i");
-    fillRect(g, 9, 5, 3, 3, "i");
-    fillRect(g, 6, 8, 3, 1, "r");
+    fillRect(g, 5, 4, 9, 1, "V");
+    fillRect(g, 6, 7, 7, 2, "r");
   }
 
-  // Door has a wide approach and is animated by the engine's 4-frame door state.
-  set(g, 7, h - 1, "E");
+  // Door has a centered entrance with a larger approach area.
+  set(g, 9, h - 1, "E");
 
   return {
     id,
     title,
     grid: toRows(g),
-    spawn: { x: 7, y: 8 },
+    spawn: { x: 9, y: 10 },
     indoor: true,
     hint,
     buildings: [],
     interactables,
-    exits: [{ x: 7, y: h - 1, to: "city", spawn: { x: 6, y: 7 } }],
+    exits: [{ x: 9, y: h - 1, to: "city", spawn: { x: 6, y: 7 } }],
   };
 }
 
@@ -980,60 +982,37 @@ export const SCENES: Record<SceneId, SceneDef> = {
   home: buildInterior(
     "home",
     "Casa — Sobre mim",
-    [
+        [
       {
-        x: 6,
-        y: 4,
-        kind: "npc",
-        npc: 2,
-        face: "down",
-        label: "Lucas Amaral",
-        dialogue: "about-intro",
+        x: 9, y: 6, kind: "npc", npc: 2, face: "down",
+        label: "Lucas Amaral", dialogue: "about-intro",
       },
-      { x: 2, y: 2, kind: "painting", label: "Quadro de Atributos", dialogue: "about-card" },
-      { x: 10, y: 2, kind: "bed", label: "Cama", dialogue: "about-hobby" },
-      { x: 4, y: 6, kind: "desk", label: "Escrivaninha de Estudos", dialogue: "about-story" },
-      { x: 9, y: 6, kind: "console", label: "Console de Jogos", dialogue: "about-seeking" },
-      { x: 1, y: 6, kind: "plant", label: "Planta Decorativa", dialogue: "flavor-plant" },
-      { x: 10, y: 2, kind: "shelf", label: "Estante de Estudos", dialogue: "about-story" },
-      { x: 2, y: 5, kind: "rug", label: "Tapete da Casa", dialogue: "city-bench" },
+      { x: 2, y: 3, kind: "painting", label: "Quadro de Atributos", dialogue: "about-card" },
+      { x: 13, y: 3, kind: "painting", label: "Quadro de Projetos", dialogue: "about-card" },
+      { x: 3, y: 4, kind: "bed", label: "Cama", dialogue: "about-hobby" },
+      { x: 14, y: 4, kind: "shelf", label: "Estante de Estudos", dialogue: "about-story" },
+      { x: 3, y: 7, kind: "desk", label: "Escrivaninha de Estudos", dialogue: "about-story" },
+      { x: 12, y: 7, kind: "console", label: "Console de Jogos", dialogue: "about-seeking" },
+      { x: 2, y: 8, kind: "plant", label: "Planta Decorativa", dialogue: "flavor-plant" },
+      { x: 15, y: 8, kind: "plant", label: "Planta do Quarto", dialogue: "flavor-plant" },
+      { x: 7, y: 8, kind: "rug", label: "Tapete da Casa", dialogue: "city-bench" },
     ],
     "Fale com o Lucas e vasculhe os móveis para conhecer sua história.",
   ),
   lab: buildInterior(
     "lab",
     "Lab SENAI — Skills & Tech",
-    [
-      { x: 2, y: 3, kind: "desk", label: "Bancada: Base de Código", dialogue: "skill-base" },
-      {
-        x: 3,
-        y: 3,
-        kind: "pokemon",
-        poke: "bulbasaur",
-        label: "Bulbasaur Pesquisador",
-        dialogue: "poke-bulbasaur",
-      },
-      { x: 5, y: 3, kind: "desk", label: "Bancada: Web & Front-end", dialogue: "skill-web" },
-      { x: 8, y: 3, kind: "desk", label: "Bancada: Dados & Backend", dialogue: "skill-data" },
-      {
-        x: 11,
-        y: 3,
-        kind: "desk",
-        label: "Bancada: Qualidade & Deploy",
-        dialogue: "skill-quality",
-      },
-      {
-        x: 6,
-        y: 6,
-        kind: "npc",
-        npc: 9,
-        face: "down",
-        label: "Instrutor SENAI",
-        dialogue: "skills-intro",
-      },
-      { x: 1, y: 6, kind: "shelf", label: "Mural de Tecnologias", dialogue: "skills-list" },
-      { x: 10, y: 6, kind: "shelf", label: "Biblioteca Técnica", dialogue: "skills-list" },
-      { x: 2, y: 5, kind: "computer", label: "Terminal de Testes", dialogue: "skill-quality" },
+        [
+      { x: 3, y: 3, kind: "desk", label: "Bancada: Base de Código", dialogue: "skill-base" },
+      { x: 6, y: 3, kind: "desk", label: "Bancada: Web & Front-end", dialogue: "skill-web" },
+      { x: 9, y: 3, kind: "desk", label: "Bancada: Dados & Backend", dialogue: "skill-data" },
+      { x: 12, y: 3, kind: "desk", label: "Bancada: Qualidade & Deploy", dialogue: "skill-quality" },
+      { x: 15, y: 3, kind: "shelf", label: "Mural de Tecnologias", dialogue: "skills-list" },
+      { x: 3, y: 7, kind: "computer", label: "Terminal de Testes", dialogue: "skill-quality" },
+      { x: 15, y: 7, kind: "shelf", label: "Biblioteca Técnica", dialogue: "skills-list" },
+      { x: 9, y: 6, kind: "npc", npc: 9, face: "down", label: "Instrutor SENAI", dialogue: "skills-intro" },
+      { x: 2, y: 8, kind: "plant", label: "Planta do Laboratório", dialogue: "flavor-plant" },
+      { x: 16, y: 8, kind: "plant", label: "Planta Técnica", dialogue: "flavor-plant" },
     ],
     "Cada bancada de pesquisa detalha uma área técnica do desenvolvedor.",
   ),
