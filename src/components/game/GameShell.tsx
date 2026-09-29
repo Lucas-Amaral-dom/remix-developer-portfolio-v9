@@ -664,7 +664,8 @@ function World({
         )}
 
         {dialogue && !screen && !battleOpponent && !battleTransitionTarget && (
-          <DialogueBox
+          <div className="game-dialogue-layer">
+            <DialogueBox
             dialogue={dialogue}
             onClose={() => setDialogueId(null)}
             onStartBattle={(oppId, openTeamBuilder = false) => {
@@ -678,7 +679,8 @@ function World({
               setHealingOverlay({ isOpen: true, source });
             }}
             formSlot={<ContactForm />}
-          />
+            />
+          </div>
         )}
 
         {screen && <SceneScreen scene={screen} data={data} onClose={() => setScreen(null)} />}
@@ -732,7 +734,7 @@ function World({
           }}
         />
 
-          {!battleActive && <div className="mobile-quick-travel" aria-label="Teleporte rápido para construções">
+          {!battleActive && !dialogue && !screen && !celebrationOpen && !healingOverlay.isOpen && <div className="mobile-quick-travel" aria-label="Teleporte rápido para construções">
             {[
               ["home", "🏠", "Casa"],
               ["lab", "🧪", "Lab"],
@@ -752,31 +754,34 @@ function World({
             ))}
           </div>}
 
-          {isPortraitMobile && <div className="mobile-portrait-overlay" role="status" aria-live="polite">
-            <div className="mobile-portrait-card">
-              <div className="text-4xl" aria-hidden="true">📱↻</div>
-              <p className="pixel-font text-[11px] text-amber-100">Gire o celular</p>
-              <p className="mt-2 text-xs leading-relaxed text-zinc-300">
-                O Desert Oasis foi preparado para jogar na horizontal, com controles de toque e
-                tela cheia.
-              </p>
-              <button
-                type="button"
-                className="pixel-font mt-4 bg-primary px-4 py-2 text-[9px] uppercase text-primary-foreground pixel-press"
-                onClick={() => {
-                  void toggleFullscreen();
-                  try {
-                    const orientation = window.screen.orientation;
-                    if (orientation?.lock) void orientation.lock("landscape");
-                  } catch {
-                    // Orientation lock is best-effort across mobile browsers.
-                  }
-                }}
-              >
-                ⛶ Tentar modo jogo
-              </button>
+          {isPortraitMobile && !dialogue && !screen && !battleActive && (
+            <div className="mobile-portrait-overlay" aria-live="polite">
+              <div className="mobile-portrait-card">
+                <div className="text-2xl" aria-hidden="true">📱↻</div>
+                <div className="min-w-0">
+                  <p className="pixel-font text-[10px] text-amber-100">Modo retrato</p>
+                  <p className="mt-1 text-[10px] leading-relaxed text-zinc-300">
+                    Funciona neste formato. Para uma experiência maior, gire para horizontal.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="pixel-font shrink-0 bg-primary px-3 py-2 text-[9px] uppercase text-primary-foreground pixel-press"
+                  onClick={() => {
+                    void toggleFullscreen();
+                    try {
+                      const orientation = window.screen.orientation;
+                      if (orientation?.lock) void orientation.lock("landscape");
+                    } catch {
+                      // Orientation lock is best-effort across mobile browsers.
+                    }
+                  }}
+                >
+                  ⛶ Expandir
+                </button>
+              </div>
             </div>
-          </div>}
+          )}
         </div>
 
       {!battleActive ? <footer className="game-shell-footer border-border shrink-0 flex flex-wrap items-center justify-between gap-2 border-t-4 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] bg-card/90 sm:gap-3 sm:px-3 sm:py-3">
@@ -853,6 +858,75 @@ function World({
   .game-shell-root .game-shell-footer button:hover,
   .game-shell-root .mobile-quick-travel-btn:hover {
     background-color: rgba(255,255,255,0.07) !important;
+  }
+}
+
+@media (max-width: 1024px) and (pointer: coarse) {
+  .game-shell-stage {
+    min-height: 0;
+    height: 100%;
+    isolation: isolate;
+  }
+  .game-shell-footer {
+    position: relative;
+    z-index: 20;
+    min-height: clamp(70px, 16dvh, 104px);
+    align-items: center;
+  }
+  .game-dpad {
+    flex: 0 0 auto;
+    width: min(100%, 360px);
+    gap: clamp(10px, 3vw, 24px);
+  }
+  .game-dpad-btn {
+    width: clamp(44px, 9vw, 56px) !important;
+    height: clamp(44px, 9vw, 56px) !important;
+  }
+  .game-dpad-action {
+    width: clamp(52px, 11vw, 68px) !important;
+    height: clamp(52px, 11vw, 68px) !important;
+  }
+  .game-dialogue-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 80;
+    pointer-events: none;
+  }
+  .game-dialogue-layer > * {
+    pointer-events: auto;
+  }
+  .game-dialogue-layer .dialogue-box {
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+  }
+  .mobile-portrait-overlay {
+    pointer-events: none !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    padding: 8px !important;
+    background: transparent !important;
+    z-index: 25 !important;
+  }
+  .mobile-portrait-card {
+    pointer-events: auto;
+    width: min(96vw, 520px) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 8px 10px !important;
+  }
+  .mobile-portrait-card button {
+    min-height: 38px !important;
+  }
+}
+@media (min-width: 1025px) {
+  .game-dialogue-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 80;
+    pointer-events: none;
+  }
+  .game-dialogue-layer > * {
+    pointer-events: auto;
   }
 }
 `}</style>
