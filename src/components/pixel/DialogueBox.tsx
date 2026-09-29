@@ -7,6 +7,7 @@ import {
   TRAINER_VARIANT_BY_OPPONENT_ID,
 } from "@/lib/trainer-assets";
 import { PixelButton } from "./PixelButton";
+import battleDawn from "@/assets/trainers/battle/dawn.png";
 
 interface Props {
   dialogue: Dialogue;
@@ -79,13 +80,17 @@ function TrainerAvatar({
   const isTrainerSpeaker = speakerVariant !== undefined && !isPokemonSpeaker;
   // The NPC's own speaker identity is authoritative. The opponent ID is only
   // a fallback for legacy/object dialogues that do not have a trainer speaker.
-  const battleVariant = speakerVariant ?? (
-    battleOpponentId ? TRAINER_VARIANT_BY_OPPONENT_ID[battleOpponentId] : undefined
-  );
+  const battleVariant = speaker === "Enfermeira Joy"
+    ? undefined
+    : speakerVariant ?? (
+      battleOpponentId ? TRAINER_VARIANT_BY_OPPONENT_ID[battleOpponentId] : undefined
+    );
   const battleTrainerSprite =
-    isTrainerSpeaker && battleVariant !== undefined
-      ? (BATTLE_TRAINER_SPRITES_BY_VARIANT[battleVariant] ?? opponent?.trainerAvatar ?? null)
-      : (opponent?.trainerAvatar ?? null);
+    speaker === "Enfermeira Joy"
+      ? battleDawn
+      : isTrainerSpeaker && battleVariant !== undefined
+        ? (BATTLE_TRAINER_SPRITES_BY_VARIANT[battleVariant] ?? opponent?.trainerAvatar ?? null)
+        : (opponent?.trainerAvatar ?? null);
   const pokemonBattleSprite = pokemonDexId
     ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonDexId}.png`
     : null;
