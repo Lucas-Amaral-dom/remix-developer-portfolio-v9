@@ -1760,6 +1760,11 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     ]) as unknown as { pos: { x: number; y: number } };
 
     const SPEED = 120;
+    // Mobile performance: the overworld has many more autonomous entities than interiors.
+    // AI and depth sorting do not need to run at render-frame frequency. Keeping the
+    // cadence lower on touch devices reduces CPU pressure without changing movement speed.
+    const aiInterval = touchLayout ? 1 / 12 : 1 / 20;
+    const depthInterval = touchLayout ? 1 / 20 : 1 / 30;
     let aiTick = 0;
     let depthTick = 0;
 
@@ -1768,19 +1773,18 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       const now = k.time();
       aiTick += dt;
       depthTick += dt;
-      const runAiStep = aiTick >= 1 / 20;
-      if (runAiStep) aiTick = 0;
+      const runAiStep = aiTick >= aiInterval;
+      if (runAiStep) aiTick -= aiInterval;
       // Keep player shadow aligned under feet
       setPosX(playerShadow, player.pos.x);
       setPosY(playerShadow, player.pos.y - 2);
 
       // Dynamic Y-depth sorting so characters and player never clip through roofs, walls or each other
-      if (depthTick >= 1 / 30) {
-        depthTick = 0;
+      if (depthTick >= depthInterval) {
+        depthTick -= depthInterval;
         player.z = 20 + Math.floor(player.pos.y / 8);
-        for (const npc of activeNpcs) {
-          npc.spr.z = 20 + Math.floor(npc.spr.pos.y / 8);
-        }
+        for (const npc of activeNpcs) npc.spr.z = 20 + Math.floor(npc.spr.pos.y / 8);
+        for (const p of activePokemon) p.spr.z = 20 + Math.floor(p.spr.pos.y / 8);
       }
 
       // Doors slide open smoothly when near
@@ -1796,11 +1800,9 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       for (const p of activePokemon) {
         if (state.paused || p.state === "talking") continue;
 
-        p.spr.z = 20 + Math.floor(p.spr.pos.y / 8);
-
         if (p.state === "idle") {
           if (!runAiStep) continue;
-          p.idleTimer -= 1 / 20;
+          p.idleTimer -= aiInterval;
           // Gentle breathing idle
           const t = now;
           setScaleY(p.spr, p.baseScale + Math.sin(t * 3.5 + p.curCol) * 0.04);
@@ -1900,7 +1902,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           setPosY(npc.shadow, npc.curRow * TILE + TILE - 2);
           // Idle sprites only change frame when direction/state changes. Rewriting
           // the frame and opacity every animation tick created unnecessary work.
-          npc.idleTimer -= 1 / 20;
+          npc.idleTimer -= aiInterval;
 
           if (npc.idleTimer <= 0) {
             const dirs: Dir[] = ["down", "left", "right", "up"];
