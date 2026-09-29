@@ -256,21 +256,21 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
 
   return (
     <div
-      className="pointer-events-auto absolute inset-x-2 bottom-2 z-30 md:inset-x-8 md:bottom-6 cursor-pointer select-none"
+      className="pointer-events-auto absolute inset-x-1 bottom-1 z-30 md:inset-x-8 md:bottom-6 cursor-pointer select-none sm:inset-x-2"
       onClick={(e) => {
         // Only advance if click was not inside an input, textarea or button
         if (e.target instanceof HTMLElement && e.target.closest("button,a,input,textarea")) return;
         advance();
       }}
     >
-      <div className="bg-card text-card-foreground pixel-frame relative p-4 pt-6 md:p-6 md:pt-7">
+      <div className="bg-card/95 text-card-foreground pixel-frame relative p-3 pt-5 sm:p-4 sm:pt-6 md:p-6 md:pt-7 max-h-[58dvh] overflow-y-auto">
         <span className="pixel-font bg-primary text-primary-foreground absolute -top-3 left-3 px-2 py-1 text-[9px]">
           {dialogue.speaker}
         </span>
 
-        <div className="flex items-start gap-3.5 md:gap-5">
+        <div className="flex items-start gap-2.5 sm:gap-3.5 md:gap-5">
           <TrainerAvatar speaker={dialogue.speaker} battleOpponentId={battlePageOpponentId} />
-          <p className="flex-1 min-h-[3.5rem] text-sm leading-relaxed whitespace-pre-line md:text-base">
+          <p className="flex-1 min-w-0 min-h-[4rem] text-[13px] leading-6 whitespace-pre-line sm:text-sm md:text-base">
             {shown}
             {!done && (
               <span className="ml-0.5 inline-block animate-[blink-cursor_1s_steps(1)_infinite]">
@@ -288,7 +288,7 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
                 href={l.href}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="pixel-font pixel-press bg-accent text-accent-foreground px-3 py-2 text-[10px]"
+                className="pixel-font pixel-press bg-accent/85 text-accent-foreground min-h-11 px-3 py-2.5 text-[10px] sm:text-[11px] touch-manipulation"
               >
                 {l.label} ↗
               </a>
@@ -355,7 +355,7 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
         {done && dialogue.form && formSlot ? <div className="mt-4">{formSlot}</div> : null}
 
         <div className="mt-4 flex items-center justify-between gap-3">
-          <span className="pixel-font text-muted-foreground text-[9px]">
+          <span className="pixel-font text-muted-foreground text-[8px] sm:text-[9px]">
             {page + 1}/{dialogue.pages.length} · A / Enter
           </span>
           <div className="flex gap-2">
