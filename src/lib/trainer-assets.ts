@@ -153,4 +153,14 @@ export const TRAINER_VARIANT_BY_OPPONENT_ID: Record<string, number> = {
   merchant: 8,
   bulbasaur: 10,
   chansey: 5,
+
+  // Lower-area trainers.
+  builder: 7,
+  tourist: 6,
+  "oasis-traveler": 1,
+  "square-trainer": 0,
+  explorer: 2,
+  artist: 4,
+  "field-researcher": 7,
+  "oasis-researcher": 10,
 };
