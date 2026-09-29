@@ -1412,6 +1412,25 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       return blockedCells[row * mapW + col] === 1;
     };
 
+    // NPC/Pokémon roaming uses a stricter footprint than the player. Precompute
+    // it once per scene so mobile devices never scan every building during AI.
+    const roamingBlockedCells = new Uint8Array(mapW * mapH);
+    if (!scene.indoor) {
+      for (let row = 0; row < mapH; row++) {
+        for (let col = 0; col < mapW; col++) {
+          roamingBlockedCells[row * mapW + col] =
+            isRoamingBlocked(scene, rows, col, row) ? 1 : 0;
+        }
+      }
+    } else {
+      roamingBlockedCells.set(blockedCells);
+    }
+
+    const roamingBlocked = (col: number, row: number) => {
+      if (col < 0 || row < 0 || col >= mapW || row >= mapH) return true;
+      return roamingBlockedCells[row * mapW + col] === 1;
+    };
+
     for (let row = 0; row < mapH; row++) {
       for (let col = 0; col < mapW; col++) {
         drawTile(rows[row]![col] ?? "s", col, row, rows);
@@ -1712,18 +1731,27 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     ]) as unknown as { pos: { x: number; y: number } };
 
     const SPEED = 120;
+    let aiTick = 0;
+    let depthTick = 0;
 
     k.onUpdate(() => {
       const dt = k.dt();
       const now = k.time();
+      aiTick += dt;
+      depthTick += dt;
+      const runAiStep = aiTick >= 1 / 20;
+      if (runAiStep) aiTick = 0;
       // Keep player shadow aligned under feet
       setPosX(playerShadow, player.pos.x);
       setPosY(playerShadow, player.pos.y - 2);
 
       // Dynamic Y-depth sorting so characters and player never clip through roofs, walls or each other
-      player.z = 20 + Math.floor(player.pos.y / 8);
-      for (const npc of activeNpcs) {
-        npc.spr.z = 20 + Math.floor(npc.spr.pos.y / 8);
+      if (depthTick >= 1 / 30) {
+        depthTick = 0;
+        player.z = 20 + Math.floor(player.pos.y / 8);
+        for (const npc of activeNpcs) {
+          npc.spr.z = 20 + Math.floor(npc.spr.pos.y / 8);
+        }
       }
 
       // Doors slide open smoothly when near
@@ -1742,7 +1770,8 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         p.spr.z = 20 + Math.floor(p.spr.pos.y / 8);
 
         if (p.state === "idle") {
-          p.idleTimer -= dt;
+          if (!runAiStep) continue;
+          p.idleTimer -= 1 / 20;
           // Gentle breathing idle
           const t = now;
           setScaleY(p.spr, p.baseScale + Math.sin(t * 3.5 + p.curCol) * 0.04);
@@ -1765,20 +1794,23 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
                 [0, 1],
                 [0, -1],
               ];
-              const [dx, dy] = dirs[Math.floor(Math.random() * dirs.length)]!;
-              const nextCol = p.curCol + dx;
-              const nextRow = p.curRow + dy;
-              const distFromHome = Math.hypot(nextCol - p.homeCol, nextRow - p.homeRow);
+              const candidates = dirs
+                .map(([dx, dy]) => ({ dx, dy, col: p.curCol + dx, row: p.curRow + dy }))
+                .filter(({ col, row }) => {
+                  const dist = Math.hypot(col - p.homeCol, row - p.homeRow);
+                  return dist <= 1.8 && !roamingBlocked(col, row);
+                })
+                .filter(({ col, row }) =>
+                  !activePokemon.some(
+                    (other) => other !== p && other.curCol === col && other.curRow === row,
+                  ),
+                );
+              const candidate = candidates.length
+                ? candidates[Math.floor(Math.random() * candidates.length)]!
+                : null;
 
-              const occupiedByOtherPokemon = activePokemon.some(
-                (other) => other !== p && other.curCol === nextCol && other.curRow === nextRow,
-              );
-
-              if (
-                distFromHome <= 1.8 &&
-                !isRoamingBlocked(scene, rows, nextCol, nextRow) &&
-                !occupiedByOtherPokemon
-              ) {
+              if (candidate) {
+                const { dx, dy, col: nextCol, row: nextRow } = candidate;
                 p.state = "walking";
                 p.facing = dx < 0 ? "left" : dx > 0 ? "right" : dy < 0 ? "up" : "down";
                 // Apply lateral flip immediately so a leftward walk never starts
@@ -1831,6 +1863,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         if (npc.item.label === "Enfermeira Joy") continue;
 
         if (npc.state === "idle") {
+          if (!runAiStep) continue;
           // Subtle breathing/bobbing keeps stationary trainers from looking frozen.
           // It is intentionally tiny so the pixel-art silhouette stays stable.
           const idleBob = Math.sin(now * 3.2 + npc.homeCol * 0.7 + npc.homeRow * 0.4) * 0.45;
@@ -1838,7 +1871,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           setPosY(npc.shadow, npc.curRow * TILE + TILE - 2);
           // Idle sprites only change frame when direction/state changes. Rewriting
           // the frame and opacity every animation tick created unnecessary work.
-          npc.idleTimer -= dt;
+          npc.idleTimer -= 1 / 20;
 
           if (npc.idleTimer <= 0) {
             const dirs: Dir[] = ["down", "left", "right", "up"];
@@ -1849,31 +1882,35 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
               npc.idleTimer = 0.7 + Math.random() * 1.1;
             } else {
               // Choose a step to walk
-              const pickDir = dirs[Math.floor(Math.random() * dirs.length)]!;
-              const deltaX = pickDir === "right" ? 1 : pickDir === "left" ? -1 : 0;
-              const deltaY = pickDir === "down" ? 1 : pickDir === "up" ? -1 : 0;
-              const nextCol = npc.curCol + deltaX;
-              const nextRow = npc.curRow + deltaY;
+              const candidates = dirs
+                .map((pickDir) => ({
+                  pickDir,
+                  col: npc.curCol + (pickDir === "right" ? 1 : pickDir === "left" ? -1 : 0),
+                  row: npc.curRow + (pickDir === "down" ? 1 : pickDir === "up" ? -1 : 0),
+                }))
+                .filter(({ col, row }) => {
+                  const dist = Math.hypot(col - npc.homeCol, row - npc.homeRow);
+                  return dist <= 2.2 && !roamingBlocked(col, row);
+                })
+                .filter(({ col, row }) => {
+                  const pTileX = Math.floor(player.pos.x / TILE);
+                  const pTileY = Math.floor(player.pos.y / TILE);
+                  if (col === pTileX && row === pTileY) return false;
+                  return !activeNpcs.some(
+                    (other) =>
+                      other !== npc &&
+                      ((other.curCol === col && other.curRow === row) ||
+                        (other.state === "walking" &&
+                          Math.round((other.targetX - TILE / 2) / TILE) === col &&
+                          Math.round((other.targetY - (TILE - 2)) / TILE) === row)),
+                  );
+                });
+              const candidate = candidates.length
+                ? candidates[Math.floor(Math.random() * candidates.length)]!
+                : null;
 
-              const distFromHome = Math.hypot(nextCol - npc.homeCol, nextRow - npc.homeRow);
-              const pTileX = Math.floor(player.pos.x / TILE);
-              const pTileY = Math.floor(player.pos.y / TILE);
-              const nearPlayer = nextCol === pTileX && nextRow === pTileY;
-              const occupiedByOther = activeNpcs.some(
-                (other) =>
-                  other !== npc &&
-                  ((other.curCol === nextCol && other.curRow === nextRow) ||
-                    (other.state === "walking" &&
-                      Math.round((other.targetX - TILE / 2) / TILE) === nextCol &&
-                      Math.round((other.targetY - (TILE - 2)) / TILE) === nextRow)),
-              );
-
-              if (
-                distFromHome <= 2.2 &&
-                !isRoamingBlocked(scene, rows, nextCol, nextRow) &&
-                !nearPlayer &&
-                !occupiedByOther
-              ) {
+              if (candidate) {
+                const { pickDir, col: nextCol, row: nextRow } = candidate;
                 npc.state = "walking";
                 npc.facing = pickDir;
                 // Set the direction frame immediately, so the first walking tick
