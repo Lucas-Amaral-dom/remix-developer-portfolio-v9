@@ -24,7 +24,7 @@ import townBluehallSprite from "@/assets/build-town-bluehall.png";
 import townPinkcottageSprite from "@/assets/build-town-pinkcottage.png";
 import townOrangecottageSprite from "@/assets/build-town-orangecottage.png";
 import trainerOverworldAtlas from "@/assets/characters.png";
-import overworldDawn from "@/assets/trainers/overworld/dawn.png";
+import battleDawn from "@/assets/trainers/battle/dawn.png";
 import doorModernSprite from "@/assets/door-modern.png";
 import doorWoodSprite from "@/assets/door-wood.png";
 import desertSandTile from "@/assets/tiles/desert-sand.png";
@@ -152,7 +152,7 @@ const SPRITES: Record<string, string> = {
   "poke-delphox": DelphoxSprite,
   "poke-greninja": GreninjaSprite,
   "poke-yveltal": YveltalSprite,
-  "nurse-joy-world": overworldDawn,
+  "nurse-joy-world": battleDawn,
   "poke-primarina": PrimarinaSprite,
   "poke-golisopod": GolisopodSprite,
   "poke-mimikyu": MimikyuSprite,
@@ -1647,7 +1647,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           : k.sprite("trainer-chars", { frame: trainerFrame(trainerVariant, face, 0) }),
         k.pos(px, py),
         k.anchor("bot"),
-        k.scale(isNurseJoy ? 0.38 : 1),
+        k.scale(isNurseJoy ? 0.75 : 1),
         k.opacity(1),
         k.z(20),
       ]) as unknown as { frame?: number; pos: { x: number; y: number }; opacity: number; z: number };
