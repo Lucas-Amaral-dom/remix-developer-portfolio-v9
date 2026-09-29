@@ -789,7 +789,7 @@ export function PokemonBattle({
         </div>
 
         {/* Battle Scene Stage */}
-        <div className="relative flex-1 bg-gradient-to-b from-[#7fa2cc] via-[#d5be9b] to-[#b9986b] overflow-hidden select-none">
+        <div className="battle-stage relative flex-1 bg-gradient-to-b from-[#7fa2cc] via-[#d5be9b] to-[#b9986b] overflow-hidden select-none">
           {/* Desert arena floor texture */}
           <div className="absolute inset-x-0 bottom-0 h-32 bg-[#8e734c]/65 border-t-2 border-[#b59365]" />
 
