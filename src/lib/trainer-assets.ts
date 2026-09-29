@@ -115,8 +115,9 @@ export const TRAINER_VARIANT_BY_ID: Record<string, number> = {
   "Juíza da Arena": 11,
   Juíza: 11,
 
-  Lucas: 5,
-  "Lucas Amaral": 5,
+  // The protagonist uses Red as the stable fallback with full walking frames.
+  Lucas: 0,
+  "Lucas Amaral": 0,
 };
 
 export const TRAINER_OVERWORLD_PORTRAITS_BY_VARIANT: Record<number, string> = {
