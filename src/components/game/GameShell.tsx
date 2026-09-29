@@ -839,6 +839,21 @@ function World({
   .game-shell-footer .game-footer-action-group button,
   .game-shell-footer > div > button { min-height: 40px !important; padding: 7px 10px !important; font-size: 11px !important; }
   .mobile-quick-travel-btn { min-height: 40px !important; padding: 7px 10px !important; font-size: 11px !important; }
+  .game-shell-root .game-shell-header button,
+  .game-shell-root .game-shell-header summary,
+  .game-shell-root .game-shell-footer button,
+  .game-shell-root .mobile-quick-travel-btn,
+  .game-shell-root .mobile-portrait-card button {
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  .game-shell-root .game-shell-header button:hover,
+  .game-shell-root .game-shell-footer button:hover,
+  .game-shell-root .mobile-quick-travel-btn:hover {
+    background-color: rgba(255,255,255,0.07) !important;
+  }
 }
 `}</style>
     </div>
