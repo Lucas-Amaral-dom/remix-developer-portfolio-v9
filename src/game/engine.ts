@@ -24,6 +24,7 @@ import townBluehallSprite from "@/assets/build-town-bluehall.png";
 import townPinkcottageSprite from "@/assets/build-town-pinkcottage.png";
 import townOrangecottageSprite from "@/assets/build-town-orangecottage.png";
 import trainerOverworldAtlas from "@/assets/characters.png";
+import playerLucasSprite from "@/assets/trainers/overworld/lucas.png";
 import doorModernSprite from "@/assets/door-modern.png";
 import doorWoodSprite from "@/assets/door-wood.png";
 import desertSandTile from "@/assets/tiles/desert-sand.png";
@@ -123,6 +124,7 @@ const SPRITES: Record<string, string> = {
   "town-bluehall": townBluehallSprite,
   "town-pinkcottage": townPinkcottageSprite,
   "town-orangecottage": townOrangecottageSprite,
+  "player-lucas": playerLucasSprite,
   "poke-pikachu": PikachuSprite,
   "poke-psyduck": PsyduckSprite,
   "poke-charmander": CharmanderSprite,
@@ -171,7 +173,8 @@ const SPRITES: Record<string, string> = {
 // from being shown when an NPC changes direction.
 const TRAINER_DIR_INDEX: Record<Dir, number> = { down: 0, up: 1, left: 2, right: 3 };
 const TRAINER_FRAMES_PER_DIRECTION = 4;
-const PLAYER_TRAINER_VARIANT = 5; // Lucas — same variant used by battle/portfolio assets.
+const PLAYER_TRAINER_VARIANT = 5; // Atlas index: 6th block = Lucas.
+const PLAYER_SPRITE = "player-lucas";
 const WALK_ANIMATION_FPS = 10;
 
 const trainerFrame = (variant: number, dir: Dir, walkFrame = 0) =>
@@ -1263,8 +1266,11 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   }
 
   function makePlayer(pos: { x: number; y: number }, initialFacing: Dir = "down") {
+    // Use the standalone Lucas overworld asset as the identity source for the
+    // protagonist. It is a single front-facing pose, so horizontal direction
+    // is mirrored and walking is communicated by a lightweight step bob.
     const p = k.add([
-      k.sprite("trainer-chars", { frame: trainerFrame(PLAYER_TRAINER_VARIANT, initialFacing, 0) }),
+      k.sprite(PLAYER_SPRITE),
       k.pos(pos.x * TILE + TILE / 2, pos.y * TILE + TILE),
       k.anchor("bot"),
       k.scale(1.0),
@@ -1272,6 +1278,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       { facing: initialFacing, step: 0, walkAnimTime: 0 },
       "player",
     ]);
+    setScaleX(p, initialFacing === "left" ? -1 : 1);
     return p;
   }
 
@@ -1966,22 +1973,26 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         state.facing = player.facing;
 
         const movedDist = Math.hypot(player.pos.x - prevX, player.pos.y - prevY);
+        // The standalone Lucas asset has one pose; keep the sprite unmistakably
+        // Lucas while adding a small four-step movement bob.
+        setScaleX(player, player.facing === "left" ? -1 : 1);
+
         if (movedDist > 0.001) {
           // Animation is time-based, not distance-based, so up/down movement starts
           // immediately even when the first few rendered frames move only slightly.
           player.walkAnimTime += k.dt();
           const walkFrame = Math.floor(player.walkAnimTime * WALK_ANIMATION_FPS) % 4;
           player.step = walkFrame;
-          player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, walkFrame);
+          setScaleX(player, player.facing === "left" ? -1 : 1);
         } else {
           player.walkAnimTime = 0;
           player.step = 0;
-          player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, 0);
+          setScaleX(player, player.facing === "left" ? -1 : 1);
         }
       } else {
         player.walkAnimTime = 0;
         player.step = 0;
-        player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, 0);
+        setScaleX(player, player.facing === "left" ? -1 : 1);
       }
 
       // Check nearest interaction or door
@@ -2148,7 +2159,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         doorObj.apply(1);
         if (activePlayer) {
           activePlayer.facing = "up";
-          activePlayer.frame = trainerFrame(PLAYER_TRAINER_VARIANT, "up");
+          setScaleX(activePlayer, 1);
           setPosX(activePlayer, doorObj.x * TILE + TILE / 2);
           setPosY(activePlayer, doorObj.y * TILE + 2);
         }
