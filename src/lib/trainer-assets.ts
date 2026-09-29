@@ -124,3 +124,18 @@ export const BATTLE_TRAINER_SPRITES_BY_VARIANT: Record<number, string> = {
   10: battleHilbert,
   11: battleHilda,
 };
+
+/**
+ * Fonte de verdade para conversas que terminam em batalha.
+ * O mesmo ID liga NPC do mapa, retrato de conversa e retrato da batalha.
+ */
+export const TRAINER_VARIANT_BY_OPPONENT_ID: Record<string, number> = {
+  machop: 4,
+  psyduck: 3,
+  trapinch: 8,
+  charmander: 5,
+  porygon: 6,
+  eevee: 7,
+  arcanine: 10,
+  flygon: 2,
+};
