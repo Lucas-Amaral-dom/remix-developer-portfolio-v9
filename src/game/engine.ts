@@ -1932,7 +1932,12 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           ];
           return corners.every(
             ([cx, cy]) =>
-              !isRoamingBlocked(Math.floor(cx! / TILE), Math.floor(cy! / TILE)),
+              !isPlayerMovementBlocked(
+                scene,
+                rows,
+                Math.floor(cx! / TILE),
+                Math.floor(cy! / TILE),
+              ),
           );
         };
 
