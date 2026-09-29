@@ -250,25 +250,38 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   // to window resize, so explicitly forward container changes to it as well.
   let resizeFrame = 0;
   let viewportSyncTimer: ReturnType<typeof setTimeout> | null = null;
+  let forwardingResize = false;
 
   const syncViewport = () => {
     cancelAnimationFrame(resizeFrame);
     resizeFrame = requestAnimationFrame(() => {
+      resizeFrame = 0;
       if (root.clientWidth <= 1 || root.clientHeight <= 1) return;
-      // KAPLAY owns the internal backbuffer. Forward a real resize after the
-      // React container has settled so desktop fullscreen/restore cannot leave
-      // the renderer with a stale viewport and an otherwise healthy black canvas.
-      window.dispatchEvent(new Event("resize"));
+      // KAPLAY listens to window resize. Forward container/fullscreen changes
+      // exactly once, while ignoring the synthetic resize in this same handler
+      // so ResizeObserver cannot create a recursive resize loop.
+      if (forwardingResize) return;
+      forwardingResize = true;
+      try {
+        window.dispatchEvent(new Event("resize"));
+      } finally {
+        forwardingResize = false;
+      }
     });
   };
 
   const scheduleViewportSync = () => {
-    syncViewport();
     if (viewportSyncTimer) clearTimeout(viewportSyncTimer);
+    syncViewport();
     viewportSyncTimer = setTimeout(() => {
       viewportSyncTimer = null;
       syncViewport();
     }, 80);
+  };
+
+  const handleWindowResize = () => {
+    if (forwardingResize) return;
+    scheduleViewportSync();
   };
 
   const resizeObserver =
@@ -277,7 +290,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       : null;
   resizeObserver?.observe(root);
 
-  window.addEventListener("resize", scheduleViewportSync);
+  window.addEventListener("resize", handleWindowResize);
   window.addEventListener("orientationchange", scheduleViewportSync);
   window.addEventListener("fullscreenchange", scheduleViewportSync);
   window.addEventListener("pageshow", scheduleViewportSync);
@@ -2350,8 +2363,13 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     });
   }
 
+  let lastInteractAt = 0;
+
   function triggerInteract() {
     if (state.paused || state.transitioning) return;
+    const now = performance.now();
+    if (now - lastInteractAt < 180) return;
+    lastInteractAt = now;
     state.interact?.();
   }
 
@@ -2370,7 +2388,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       resizeObserver?.disconnect();
       cancelAnimationFrame(resizeFrame);
       if (viewportSyncTimer) clearTimeout(viewportSyncTimer);
-      window.removeEventListener("resize", scheduleViewportSync);
+      window.removeEventListener("resize", handleWindowResize);
       window.removeEventListener("orientationchange", scheduleViewportSync);
       window.removeEventListener("fullscreenchange", scheduleViewportSync);
       window.removeEventListener("pageshow", scheduleViewportSync);
