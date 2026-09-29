@@ -1240,6 +1240,10 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     // Building PNGs have roof/eave overhangs above their logical map rectangle.
     // Block that visual area too, otherwise the player/NPCs can walk across a roof.
     return scene.buildings.some((building) => {
+      // A porta faz parte do footprint visual do prédio, mas precisa continuar
+      // realmente caminhável para que o jogador consiga entrar.
+      if (col === building.door.x && row === building.door.y) return false;
+
       const left = building.x - 1;
       const right = building.x + building.w + (building.sprite === "home" ? 2 : 0);
       const top = Math.max(0, building.y - 2);
