@@ -735,5 +735,125 @@ export const MAP_OPPONENTS: BattleOpponent[] = [
   },
 ];
 
+
+// Lower-area NPC battles: these use the same local trainer portrait variant as
+// the NPC on the overworld. Keeping them explicit avoids falling back to a
+// generic trainer sprite when the player challenges a lower-map character.
+const makeLowerAreaOpponent = (
+  id: string,
+  trainer: string,
+  variantId: string,
+  pokemonName: string,
+  pokemonSprite: string,
+  level: number,
+  type: string,
+): BattleOpponent => ({
+  id,
+  name: pokemonName,
+  trainer,
+  trainerAvatar: BATTLE_TRAINER_SPRITES_BY_VARIANT[TRAINER_VARIANT_BY_OPPONENT_ID[variantId]],
+  level,
+  maxHp: 90 + level * 2,
+  sprite: pokemonSprite,
+  type,
+  rewardExp: 45 + level,
+  moves: [
+    { name: "Investida", type: "Normal", power: 16 },
+    { name: "Golpe Rápido", type: "Normal", power: 20 },
+    { name: "Técnica Focada", type, power: 24 },
+  ],
+  team: [
+    {
+      id: `${id}-1`,
+      name: pokemonName,
+      level,
+      maxHp: 90 + level * 2,
+      sprite: pokemonSprite,
+      type,
+      moves: [
+        { name: "Investida", type: "Normal", power: 16 },
+        { name: "Golpe Rápido", type: "Normal", power: 20 },
+        { name: "Técnica Focada", type, power: 24 },
+      ],
+      rewardExp: 45 + level,
+    },
+  ],
+});
+
+MAP_OPPONENTS.push(
+  makeLowerAreaOpponent(
+    "builder",
+    "Construtor do Workshop",
+    "Construtor do Workshop",
+    "Machop",
+    machopImg,
+    23,
+    "Lutador",
+  ),
+  makeLowerAreaOpponent(
+    "tourist",
+    "Turista do Deserto",
+    "Turista do Deserto",
+    "Pikachu",
+    pikachuImg,
+    21,
+    "Elétrico",
+  ),
+  makeLowerAreaOpponent(
+    "oasis-traveler",
+    "Viajante do Oásis",
+    "Viajante do Oásis",
+    "Psyduck",
+    psyduckImg,
+    21,
+    "Água",
+  ),
+  makeLowerAreaOpponent(
+    "square-trainer",
+    "Treinador da Praça",
+    "Treinador da Praça",
+    "Pikachu",
+    pikachuImg,
+    22,
+    "Elétrico",
+  ),
+  makeLowerAreaOpponent(
+    "explorer",
+    "Exploradora do Deserto",
+    "Exploradora do Deserto",
+    "Trapinch",
+    trapinchImg,
+    22,
+    "Terra",
+  ),
+  makeLowerAreaOpponent(
+    "artist",
+    "Artista do Oásis",
+    "Artista do Oásis",
+    "Eevee",
+    eeveeImg,
+    21,
+    "Normal",
+  ),
+  makeLowerAreaOpponent(
+    "field-researcher",
+    "Pesquisador de Campo",
+    "Pesquisador de Campo",
+    "Bulbasaur",
+    bulbasaurImg,
+    23,
+    "Planta / Veneno",
+  ),
+  makeLowerAreaOpponent(
+    "oasis-researcher",
+    "Pesquisadora do Oásis",
+    "Pesquisadora do Oásis",
+    "Bulbasaur",
+    bulbasaurImg,
+    24,
+    "Planta / Veneno",
+  ),
+);
+
 export const getOpponent = (id: string): BattleOpponent | undefined =>
   MAP_OPPONENTS.find((opponent) => opponent.id === id);
