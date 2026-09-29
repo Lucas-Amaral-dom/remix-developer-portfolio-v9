@@ -54,7 +54,7 @@ export const TRAINER_ATLAS_POSITION_BY_NAME = {
   Leaf: 2,
   Brendan: 3,
   May: 4,
-  Dawn: 5,
+  Dawn: 6,
   Lucas: 6,
   Serena: 7,
   Ethan: 8,
