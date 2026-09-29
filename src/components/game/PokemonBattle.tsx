@@ -715,14 +715,14 @@ export function PokemonBattle({
         />
       )}
 
-      <div className="battle-shell relative flex flex-col w-full max-w-[820px] aspect-[4/3] bg-[#1a1410] border-4 border-amber-600/80 rounded-sm shadow-[0_0_35px_rgba(0,0,0,0.9)] overflow-hidden">
+      <div className="battle-shell relative flex h-[calc(100dvh-0.5rem)] max-h-[720px] min-h-0 w-full max-w-[820px] flex-col bg-[#1a1410] border-4 border-amber-600/80 rounded-sm shadow-[0_0_35px_rgba(0,0,0,0.9)] overflow-hidden sm:aspect-[4/3] sm:h-auto">
         {/* Top Header with Opponent Selector, Team Builder Button & Close */}
-        <div className="battle-toolbar flex items-center justify-between gap-2 px-3 py-1.5 bg-[#2a1e16] border-b-2 border-amber-500/40 text-[10px]">
-          <div className="battle-toolbar-actions flex items-center gap-2 min-w-0">
+        <div className="battle-toolbar flex items-center justify-between gap-2 px-2 py-2 sm:px-3 sm:py-1.5 bg-[#2a1e16] border-b-2 border-amber-500/40 text-[11px] sm:text-[10px] overflow-x-auto">
+          <div className="battle-toolbar-actions flex items-center gap-2 min-w-max">
             <span className="text-amber-400 font-bold tracking-wide pixel-font text-[9px]">
               ⚔️ ARENA DE BATALHA POKÉMON
             </span>
-            <span className="bg-amber-500/20 text-amber-200 border border-amber-500/40 px-1.5 py-0.5 rounded text-[8px] pixel-font">
+            <span className="bg-amber-500/20 text-amber-200 border border-amber-500/40 px-2 py-1 rounded text-[9px] pixel-font">
               Vitórias: {totalWins}
             </span>
           </div>
@@ -736,7 +736,7 @@ export function PokemonBattle({
                 setSelectedMoveSlot(0);
                 sound.playInteract();
               }}
-              className="bg-emerald-700 hover:bg-emerald-600 text-emerald-100 font-bold px-2 py-0.5 rounded text-[8px] pixel-font border border-emerald-400 flex items-center gap-1 shadow cursor-pointer transition-transform active:scale-95"
+              className="bg-emerald-700 hover:bg-emerald-600 text-emerald-100 font-bold px-2.5 py-1 rounded text-[10px] pixel-font border border-emerald-400 flex items-center gap-1 shadow cursor-pointer transition-transform active:scale-95"
               title="Escolher e personalizar os golpes do seu Pokémon ativo"
             >
               <span>⚔️ Golpes</span>
@@ -768,7 +768,7 @@ export function PokemonBattle({
               value={selectedOpponentIdx}
               onChange={(e) => handleSelectOpponent(Number(e.target.value))}
               disabled={isBusy}
-              className="bg-[#18110c] text-amber-200 border border-amber-500/50 px-2 py-0.5 rounded text-[8px] pixel-font cursor-pointer focus:outline-none max-w-[130px] truncate"
+              className="bg-[#18110c] text-amber-200 border border-amber-500/50 px-2 py-0.5 rounded text-[8px] pixel-font cursor-pointer focus:outline-none max-w-[150px] truncate"
             >
               {opponentsList.map((opp, idx) => (
                 <option key={opp.id + idx} value={idx}>
@@ -789,7 +789,7 @@ export function PokemonBattle({
         </div>
 
         {/* Battle Scene Stage */}
-        <div className="relative flex-1 bg-gradient-to-b from-[#7fa2cc] via-[#d5be9b] to-[#b9986b] overflow-hidden select-none">
+        <div className="battle-stage relative flex-1 bg-gradient-to-b from-[#7fa2cc] via-[#d5be9b] to-[#b9986b] overflow-hidden select-none">
           {/* Desert arena floor texture */}
           <div className="absolute inset-x-0 bottom-0 h-32 bg-[#8e734c]/65 border-t-2 border-[#b59365]" />
 
@@ -824,7 +824,7 @@ export function PokemonBattle({
           </div>
 
           {/* Opponent Status Box (Top Left) */}
-          <div className="absolute top-4 left-4 md:left-6 w-64 bg-[#1f1610]/95 border-2 border-amber-500/70 p-2.5 rounded shadow-lg">
+          <div className="absolute top-3 left-2 sm:top-4 sm:left-4 md:left-6 w-[min(16rem,calc(100vw-1rem))] sm:w-64 bg-[#1f1610]/95 border-2 border-amber-500/70 p-2.5 rounded shadow-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 {opponent.trainerAvatar && (
@@ -847,7 +847,7 @@ export function PokemonBattle({
 
             {/* Opponent Team Pokéballs */}
             <div className="flex items-center gap-1 my-1">
-              <span className="pixel-font text-[7px] text-amber-400/80 mr-1">Time:</span>
+              <span className="pixel-font text-[9px] sm:text-[7px] text-amber-400/80 mr-1">Time:</span>
               {opponentTeam.map((member, i) => {
                 const isDefeated = i < activeOpponentIndex;
                 const isActive = i === activeOpponentIndex;
@@ -881,8 +881,8 @@ export function PokemonBattle({
                 />
               </div>
             </div>
-            <div className="flex justify-between items-center pixel-font text-[8px] text-zinc-300 mt-1">
-              <span className="text-zinc-400 text-[7px]">{opponent.trainer}</span>
+            <div className="flex justify-between items-center pixel-font text-[9px] sm:text-[8px] text-zinc-300 mt-1">
+              <span className="text-zinc-400 text-[8px] sm:text-[7px]">{opponent.trainer}</span>
               <span>
                 {opponentHp} / {currentOpponent.maxHp}
               </span>
@@ -951,7 +951,7 @@ export function PokemonBattle({
           </div>
 
           {/* Player Status Box (Bottom Right) */}
-          <div className="absolute bottom-6 right-4 md:right-8 w-64 bg-[#1f1610]/95 border-2 border-amber-500/70 p-2.5 rounded shadow-lg">
+          <div className="absolute bottom-3 right-2 sm:bottom-6 sm:right-4 md:right-8 w-[min(16rem,calc(100vw-1rem))] sm:w-64 bg-[#1f1610]/95 border-2 border-amber-500/70 p-2.5 rounded shadow-lg">
             <div className="flex items-center justify-between">
               <span className="pixel-font font-bold text-amber-200 text-[10px]">
                 {activePlayerPokemon.name}
@@ -1008,10 +1008,10 @@ export function PokemonBattle({
         </div>
 
         {/* Bottom Control & Dialogue Panel */}
-        <div className="h-36 bg-[#18110b] border-t-4 border-amber-600/90 flex flex-col sm:flex-row p-2.5 gap-2">
+        <div className="min-h-[150px] h-[150px] sm:min-h-36 sm:h-36 bg-[#18110b] border-t-4 border-amber-600/90 flex flex-col sm:flex-row p-2.5 gap-2">
           {/* Battle Message Box */}
           <div className="flex-1 bg-[#24180e] border-2 border-amber-500/50 p-2.5 rounded flex items-center shadow-inner">
-            <p className="pixel-font text-[9px] sm:text-[10px] text-amber-100 leading-relaxed">
+            <p className="pixel-font text-[11px] sm:text-[10px] text-amber-100 leading-relaxed">
               {battleLog}
             </p>
           </div>
@@ -1027,7 +1027,7 @@ export function PokemonBattle({
                     sound.playInteract();
                     setCurrentMenu("fight");
                   }}
-                  className="bg-rose-700 hover:bg-rose-600 text-white pixel-font text-[9px] font-bold rounded py-2 border border-rose-500/60 shadow active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="min-h-12 select-none touch-manipulation bg-rose-700/55 hover:bg-rose-600/65 active:bg-rose-600/75 text-white pixel-font text-[10px] font-bold rounded py-2 border border-rose-300/40 shadow active:scale-95 disabled:opacity-50 cursor-pointer backdrop-blur-sm"
                 >
                   ⚔️ LUTAR
                 </button>
@@ -1038,7 +1038,7 @@ export function PokemonBattle({
                     sound.playInteract();
                     setCurrentMenu("bag");
                   }}
-                  className="bg-amber-600 hover:bg-amber-500 text-white pixel-font text-[9px] font-bold rounded py-2 border border-amber-400/60 shadow active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="min-h-11 select-none touch-manipulation bg-amber-600/55 hover:bg-amber-500/65 active:bg-amber-500/75 text-white pixel-font text-[9px] font-bold rounded py-2 border border-amber-200/40 shadow active:scale-95 disabled:opacity-50 cursor-pointer backdrop-blur-sm"
                 >
                   🎒 BOLSA
                 </button>
@@ -1049,7 +1049,7 @@ export function PokemonBattle({
                     sound.playInteract();
                     setCurrentMenu("pokemon");
                   }}
-                  className="bg-emerald-700 hover:bg-emerald-600 text-white pixel-font text-[9px] font-bold rounded py-2 border border-emerald-500/60 shadow active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="min-h-11 select-none touch-manipulation bg-emerald-700/55 hover:bg-emerald-600/65 active:bg-emerald-600/75 text-white pixel-font text-[9px] font-bold rounded py-2 border border-emerald-300/40 shadow active:scale-95 disabled:opacity-50 cursor-pointer backdrop-blur-sm"
                 >
                   🔄 POKÉMON ({playerTeam.filter((p) => p.hp > 0).length})
                 </button>
@@ -1057,7 +1057,7 @@ export function PokemonBattle({
                   type="button"
                   disabled={isBusy}
                   onClick={handleRun}
-                  className="bg-sky-700 hover:bg-sky-600 text-white pixel-font text-[9px] font-bold rounded py-2 border border-sky-500/60 shadow active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="min-h-11 select-none touch-manipulation bg-sky-700/55 hover:bg-sky-600/65 active:bg-sky-600/75 text-white pixel-font text-[9px] font-bold rounded py-2 border border-sky-300/40 shadow active:scale-95 disabled:opacity-50 cursor-pointer backdrop-blur-sm"
                 >
                   🏃 FUGIR
                 </button>
@@ -1074,7 +1074,7 @@ export function PokemonBattle({
                       type="button"
                       disabled={isBusy || m.pp <= 0}
                       onClick={() => handlePlayerMove(idx)}
-                      className="bg-[#362315] hover:bg-[#4d321d] text-amber-200 border border-amber-500/40 text-[8px] pixel-font p-1.5 rounded text-left flex flex-col justify-between shadow active:scale-95 disabled:opacity-40 cursor-pointer"
+                      className="bg-[#362315] hover:bg-[#4d321d] text-amber-200 border border-amber-500/40 text-[9px] pixel-font p-2 rounded text-left flex flex-col justify-between shadow active:scale-95 disabled:opacity-40 cursor-pointer"
                       title={m.description}
                     >
                       <span className="font-bold text-amber-100 truncate">{m.name}</span>
@@ -1776,6 +1776,19 @@ export function PokemonBattle({
           }
         }
       `}</style>
+      <style>{`
+@media (max-width: 1024px) and (pointer: coarse) {
+  .battle-shell button {
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  .battle-shell button:hover:not(:disabled),
+  .battle-shell button:active:not(:disabled) {
+    background-color: rgba(255,255,255,0.08) !important;
+  }
+}`}</style>
     </div>
   );
 }

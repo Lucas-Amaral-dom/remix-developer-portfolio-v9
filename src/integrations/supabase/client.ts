@@ -43,20 +43,22 @@ function normalizeSupabaseUrl(value: unknown): string | null {
 }
 
 export function isSupabaseConfigured(): boolean {
-  const rawUrl = import.meta.env["VITE_SUPABASE_URL"] || process.env["SUPABASE_URL"];
+  const serverEnv = typeof process !== "undefined" ? process.env : undefined;
+  const rawUrl = import.meta.env["VITE_SUPABASE_URL"] || serverEnv?.["SUPABASE_URL"];
   const key =
-    import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || process.env["SUPABASE_PUBLISHABLE_KEY"];
+    import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || serverEnv?.["SUPABASE_PUBLISHABLE_KEY"];
   return Boolean(normalizeSupabaseUrl(rawUrl) && key);
 }
 
 function createSupabaseClient() {
   // Use import.meta.env for client-side (Vite build-time replacement)
   // Fall back to process.env for SSR (server-side rendering)
+  const serverEnv = typeof process !== "undefined" ? process.env : undefined;
   const SUPABASE_URL = normalizeSupabaseUrl(
-    import.meta.env["VITE_SUPABASE_URL"] || process.env["SUPABASE_URL"],
+    import.meta.env["VITE_SUPABASE_URL"] || serverEnv?.["SUPABASE_URL"],
   );
   const SUPABASE_PUBLISHABLE_KEY =
-    import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || process.env["SUPABASE_PUBLISHABLE_KEY"];
+    import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || serverEnv?.["SUPABASE_PUBLISHABLE_KEY"];
 
   if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
     const missing = [
