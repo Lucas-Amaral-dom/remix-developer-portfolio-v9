@@ -236,9 +236,31 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   canvas.style.height = "100%";
   canvas.style.display = "block";
   canvas.style.outline = "none";
+  canvas.style.background = "rgb(36, 26, 22)";
+  canvas.style.touchAction = "none";
+  canvas.style.userSelect = "none";
+  canvas.style.webkitUserSelect = "none";
   canvas.tabIndex = 0;
   root.appendChild(canvas);
-  canvas.addEventListener("pointerdown", () => canvas.focus());
+
+  // Mobile browsers can resize the visual viewport while the user is walking
+  // (address bar, orientation, fullscreen, keyboard/gesture UI). KAPLAY listens
+  // to window resize, so explicitly forward container changes to it as well.
+  let resizeFrame = 0;
+  const resizeObserver =
+    typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(() => {
+          cancelAnimationFrame(resizeFrame);
+          resizeFrame = requestAnimationFrame(() => {
+            if (root.clientWidth > 1 && root.clientHeight > 1) {
+              window.dispatchEvent(new Event("resize"));
+            }
+          });
+        })
+      : null;
+  resizeObserver?.observe(root);
+
+  canvas.addEventListener("pointerdown", () => canvas.focus(), { passive: true });
   requestAnimationFrame(() => canvas.focus());
 
   const touchLayout =
@@ -2308,6 +2330,8 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   return {
     destroy: () => {
       transitionManager.destroy();
+      resizeObserver?.disconnect();
+      cancelAnimationFrame(resizeFrame);
       k.quit();
       canvas.remove();
     },
