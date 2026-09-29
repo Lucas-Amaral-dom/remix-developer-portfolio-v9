@@ -239,7 +239,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     global: false,
     crisp: true,
     pixelDensity: 1,
-    stretch: false,
+    stretch: true,
     letterbox: true,
     debug: false,
     focus: false,
