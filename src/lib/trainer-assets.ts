@@ -46,44 +46,37 @@ export const TRAINER_VARIANT_NAMES = [
 ] as const;
 
 export const TRAINER_VARIANT_BY_ID: Record<string, number> = {
-  // Keep dialogue aliases aligned with the exact NPC variant used on the map.
-  // Variant 0 is the player sprite; city NPC labels intentionally point to their
-  // real exterior sprite variant so the dialogue portrait never swaps characters.
-  // Variant 0 is reserved for the player. Main city NPCs use variants 1-11
-  // exactly once so the player never shares a trainer with a principal NPC.
+  // Estes índices são os mesmos usados por world.ts para os NPCs visíveis.
   Lucas: 0,
-  "Lucas Amaral": 0,
-  Guia: 1,
-  "Guia do Oásis": 1,
-  "Viajante do Deserto": 2,
-  "Pescadora do Oásis": 3,
-  "Lutador de Sparring": 4,
-  "Campista Dev": 5,
-  "Desenvolvedor da Oficina": 6,
-  "Desenvolvedor Full Stack": 6,
-  "Mecânica de Software": 7,
-  "Ranger do Santuário": 8,
-  "Mercador do Bazar": 9,
-  "Mercador de Frutas e Itens": 9,
-  "Mestre da Arena": 10,
-  "Mestre de Batalhas": 10,
-  "Pesquisadora do Oásis": 11,
-  "Construtor do Workshop": 6,
+  "Lucas Amaral": 2,
 
-  Atendente: 2,
-  "Instrutor SENAI": 8,
-  "Hoteleira do Oásis": 5,
-  "Enfermeira Joy": 3,
-  "Arquiteto de Software": 7,
-  "Juíza da Arena": 10,
+  "Guia do Oásis": 0,
+  "Viajante do Deserto": 1,
+  "Pescadora do Oásis": 4,
+  "Lutador de Sparring": 2,
+  "Campista Dev": 3,
+  "Desenvolvedor Full Stack": 5,
+  "Mecânica de Software": 6,
+  "Ranger do Santuário": 6,
+  "Mercador de Frutas e Itens": 8,
+  "Mestre de Batalhas": 9,
+  "Pesquisadora do Oásis": 6,
+  "Construtor do Workshop": 7,
 
-  "Turista do Deserto": 2,
-  "Viajante do Oásis": 3,
-  "Treinador da Praça": 4,
-  "Exploradora do Deserto": 5,
-  "Artista do Oásis": 6,
+  "Turista do Deserto": 6,
+  "Viajante do Oásis": 1,
+  "Treinador da Praça": 0,
+  "Exploradora do Deserto": 2,
+  "Artista do Oásis": 4,
   "Pesquisador de Campo": 7,
-  "Curador de Créditos": 11,
+
+  Atendente: 1,
+  "Instrutor SENAI": 9,
+  "Hoteleira do Oásis": 5,
+  "Enfermeira Joy": 4,
+  "Arquiteto de Software": 7,
+  "Juíza da Arena": 6,
+  "Curador de Créditos": 10,
 };
 
 export const TRAINER_OVERWORLD_PORTRAITS_BY_VARIANT: Record<number, string> = {
@@ -130,12 +123,12 @@ export const BATTLE_TRAINER_SPRITES_BY_VARIANT: Record<number, string> = {
  * O mesmo ID liga NPC do mapa, retrato de conversa e retrato da batalha.
  */
 export const TRAINER_VARIANT_BY_OPPONENT_ID: Record<string, number> = {
-  machop: 4,
-  psyduck: 3,
-  trapinch: 8,
-  charmander: 5,
-  porygon: 6,
-  eevee: 7,
-  arcanine: 10,
-  flygon: 2,
+  machop: 2,
+  psyduck: 4,
+  trapinch: 6,
+  charmander: 3,
+  porygon: 5,
+  eevee: 6,
+  arcanine: 9,
+  flygon: 1,
 };
