@@ -1707,7 +1707,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
               if (
                 distFromHome <= 1.8 &&
-                !movementBlocked(nextCol, nextRow) &&
+                !isRoamingBlocked(nextCol, nextRow) &&
                 !occupiedByOtherPokemon
               ) {
                 p.state = "walking";
@@ -1789,7 +1789,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
               if (
                 distFromHome <= 2.2 &&
-                !movementBlocked(nextCol, nextRow) &&
+                !isRoamingBlocked(nextCol, nextRow) &&
                 !nearPlayer &&
                 !occupiedByOther
               ) {
@@ -1877,7 +1877,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           ];
           return corners.every(
             ([cx, cy]) =>
-              !movementBlocked(Math.floor(cx! / TILE), Math.floor(cy! / TILE)),
+              !isRoamingBlocked(Math.floor(cx! / TILE), Math.floor(cy! / TILE)),
           );
         };
 
