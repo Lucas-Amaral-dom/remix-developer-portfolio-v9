@@ -1329,6 +1329,21 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     const mapW = rows[0]!.length;
     const mapH = rows.length;
 
+    // Precompute the complete movement grid once per scene. The old per-frame
+    // collision path repeatedly scanned every building for each corner of the
+    // player hitbox, which was disproportionately expensive on mobile CPUs.
+    const blockedCells = new Uint8Array(mapW * mapH);
+    for (let row = 0; row < mapH; row++) {
+      for (let col = 0; col < mapW; col++) {
+        blockedCells[row * mapW + col] = isMovementBlocked(scene, rows, col, row) ? 1 : 0;
+      }
+    }
+
+    const movementBlocked = (col: number, row: number) => {
+      if (col < 0 || row < 0 || col >= mapW || row >= mapH) return true;
+      return blockedCells[row * mapW + col] === 1;
+    };
+
     for (let row = 0; row < mapH; row++) {
       for (let col = 0; col < mapW; col++) {
         drawTile(rows[row]![col] ?? "s", col, row, rows);
@@ -1684,7 +1699,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
               if (
                 distFromHome <= 1.8 &&
-                !isRoamingBlocked(scene, rows, nextCol, nextRow) &&
+                !movementBlocked(nextCol, nextRow) &&
                 !occupiedByOtherPokemon
               ) {
                 p.state = "walking";
@@ -1729,18 +1744,11 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
       // Update active NPCs with authentic Pokemon movement AI
       for (const npc of activeNpcs) {
-        if (state.paused || npc.state === "talking") {
-          npc.walkAnimTime = 0;
-          npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, 0);
-          npc.spr.opacity = 1;
-          continue;
-        }
+        if (state.paused || npc.state === "talking") continue;
 
         if (npc.state === "idle") {
-          // Always maintain clean standing idle pose (frame 0) with zero twitching
-          npc.walkAnimTime = 0;
-          npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, 0);
-          npc.spr.opacity = 1;
+          // Idle sprites only change frame when direction/state changes. Rewriting
+          // the frame and opacity every animation tick created unnecessary work.
           npc.idleTimer -= dt;
 
           if (npc.idleTimer <= 0) {
@@ -1773,7 +1781,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
               if (
                 distFromHome <= 2.2 &&
-                !isRoamingBlocked(scene, rows, nextCol, nextRow) &&
+                !movementBlocked(nextCol, nextRow) &&
                 !nearPlayer &&
                 !occupiedByOther
               ) {
@@ -1861,7 +1869,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           ];
           return corners.every(
             ([cx, cy]) =>
-              !isMovementBlocked(scene, rows, Math.floor(cx! / TILE), Math.floor(cy! / TILE)),
+              !movementBlocked(Math.floor(cx! / TILE), Math.floor(cy! / TILE)),
           );
         };
 
@@ -2150,6 +2158,9 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         for (const npc of currentActiveNpcs) {
           if (npc.state === "talking") {
             npc.state = "idle";
+            npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, 0);
+            npc.spr.opacity = 1;
+            npc.walkAnimTime = 0;
             npc.idleTimer = 2.0 + Math.random() * 2.0;
           }
         }
