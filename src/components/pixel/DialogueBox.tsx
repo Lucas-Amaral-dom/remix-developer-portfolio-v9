@@ -77,9 +77,11 @@ function TrainerAvatar({
   const pokemonDexId = findPokemonDexId(speaker);
   const isPokemonSpeaker = Boolean(pokemonDexId);
   const isTrainerSpeaker = speakerVariant !== undefined && !isPokemonSpeaker;
-  const battleVariant = battleOpponentId
-    ? TRAINER_VARIANT_BY_OPPONENT_ID[battleOpponentId]
-    : speakerVariant;
+  // The NPC's own speaker identity is authoritative. The opponent ID is only
+  // a fallback for legacy/object dialogues that do not have a trainer speaker.
+  const battleVariant = speakerVariant ?? (
+    battleOpponentId ? TRAINER_VARIANT_BY_OPPONENT_ID[battleOpponentId] : undefined
+  );
   const battleTrainerSprite =
     isTrainerSpeaker && battleVariant !== undefined
       ? (BATTLE_TRAINER_SPRITES_BY_VARIANT[battleVariant] ?? opponent?.trainerAvatar ?? null)

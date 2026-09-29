@@ -166,10 +166,10 @@ const SPRITES: Record<string, string> = {
  * The variant order is centralized in `@/lib/trainer-assets` so overworld and
  * dialogue sprites cannot drift apart.
  */
-// characters.png stores four direction rows per trainer in this order:
-// down, up, left, right. Keeping this map explicit prevents side/back poses
+// characters.png stores four direction rows per trainer in this physical order:
+// down, left, right, up. Keeping this map explicit prevents side/back poses
 // from being shown when an NPC changes direction.
-const TRAINER_DIR_INDEX: Record<Dir, number> = { down: 0, up: 1, left: 2, right: 3 };
+const TRAINER_DIR_INDEX: Record<Dir, number> = { down: 0, left: 1, right: 2, up: 3 };
 const TRAINER_FRAMES_PER_DIRECTION = 4;
 // characters.png is 32x1536 and stores 12 trainers × 4 directions × 4 frames.
 // The Lucas block is the 6th block (rows 20–23), i.e. zero-based variant 5.
