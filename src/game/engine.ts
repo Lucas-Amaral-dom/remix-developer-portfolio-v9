@@ -302,7 +302,10 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     crisp: true,
     pixelDensity: 1,
     stretch: true,
-    letterbox: true,
+    // Keep the fixed 16:9 letterbox only on touch layouts. Desktop uses the
+    // full stage without the extra viewport transform, which avoids stale
+    // backbuffer/camera state after wide-screen resize or fullscreen restore.
+    letterbox: touchLayout,
     debug: false,
     focus: false,
   });
