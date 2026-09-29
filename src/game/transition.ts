@@ -54,13 +54,13 @@ export class TransitionManager {
   }
 
   public runTransition(opts: TransitionOptions) {
+    if (this.isRunning) this.cancel();
     if (!this.ctx) {
       opts.onMidpoint();
       opts.onComplete();
       return;
     }
 
-    this.cancel();
     this.isRunning = true;
 
     const ctx = this.ctx;
@@ -99,10 +99,7 @@ export class TransitionManager {
             }
           } catch (error) {
             console.error("Scene transition failed:", error);
-            // Abort the visual transition instead of freezing on a black frame.
-            this.isRunning = false;
-            this.animId = null;
-            ctx.clearRect(0, 0, w, h);
+            this.cancel();
             opts.onComplete();
             return;
           }
