@@ -280,6 +280,27 @@
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
+  -webkit-user-drag: none;
+}
+
+.game-shell-root button,
+.game-shell-root a,
+.game-shell-root [role="button"] {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  touch-action: manipulation;
+}
+
+.game-shell-root .game-dpad button {
+  touch-action: none;
+}
+
+.game-shell-root img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .game-shell-stage,
