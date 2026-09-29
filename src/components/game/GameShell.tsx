@@ -652,6 +652,7 @@ function World({
             }}
             onHeal={(source) => {
               setDialogueId(null);
+              gameRef.current?.clearInteraction();
               setHealingOverlay({ isOpen: true, source });
             }}
             formSlot={<ContactForm />}
@@ -686,7 +687,10 @@ function World({
         <PokeCenterHealOverlay
           isOpen={healingOverlay.isOpen}
           source={healingOverlay.source}
-          onClose={() => setHealingOverlay({ isOpen: false, source: "nurse" })}
+          onClose={() => {
+            setHealingOverlay({ isOpen: false, source: "nurse" });
+            gameRef.current?.clearInteraction();
+          }}
         />
 
         {/* 4-Badge Celebration Modal */}

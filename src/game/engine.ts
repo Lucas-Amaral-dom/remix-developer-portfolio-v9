@@ -104,6 +104,7 @@ export interface GameHandle {
   setPaused: (paused: boolean) => void;
   setDir: (dir: Dir | null) => void;
   interact: () => void;
+  clearInteraction: () => void;
   goTo: (scene: SceneId) => void;
   setTransitionType: (type: TransitionType) => void;
 }
@@ -1425,8 +1426,11 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     currentDoors = doors;
 
     if (scene.indoor) {
-      const dx = 7 * TILE;
-      const dy = (scene.grid.length - 2) * TILE;
+      const exit = scene.exits[0];
+      const exitX = exit?.x ?? 9;
+      const exitY = exit?.y ?? scene.grid.length - 1;
+      const dx = exitX * TILE;
+      const dy = (exitY - 1) * TILE;
       const doorGlow = k.add([
         k.rect(22, 12, { radius: 2 }),
         k.pos(dx + TILE / 2, dy + 20),
@@ -1448,9 +1452,9 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         doorGlow.opacity = openVal * 0.5;
       };
       doors.push({
-        x: 7,
-        y: scene.grid.length - 1,
-        to: "city",
+        x: exitX,
+        y: exitY,
+        to: exit?.to ?? "city",
         sign: "Sair para o Oásis",
         open: 0,
         apply: applyInteriorDoor,
@@ -2228,6 +2232,12 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     state.interact?.();
   }
 
+  function clearInteraction() {
+    state.interact = null;
+    state.lastPromptKey = "";
+    cb.onPrompt(null);
+  }
+
   let currentSceneId: SceneId = "city";
   k.go("play", { id: "city" });
 
@@ -2241,6 +2251,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       state.paused = paused;
       if (paused) {
         state.dir = null;
+        clearInteraction();
       } else {
         for (const npc of currentActiveNpcs) {
           if (npc.state === "talking") {
@@ -2257,6 +2268,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       state.dir = dir;
     },
     interact: triggerInteract,
+    clearInteraction,
     goTo,
     setTransitionType: (type: TransitionType) => {
       currentTransitionType = type;
