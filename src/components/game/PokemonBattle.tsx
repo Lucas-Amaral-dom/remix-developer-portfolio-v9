@@ -715,7 +715,7 @@ export function PokemonBattle({
         />
       )}
 
-      <div className="battle-shell relative flex flex-col w-full max-w-[820px] aspect-[4/3] bg-[#1a1410] border-4 border-amber-600/80 rounded-sm shadow-[0_0_35px_rgba(0,0,0,0.9)] overflow-hidden">
+      <div className="battle-shell relative flex h-[calc(100dvh-0.5rem)] max-h-[720px] min-h-0 w-full max-w-[820px] flex-col bg-[#1a1410] border-4 border-amber-600/80 rounded-sm shadow-[0_0_35px_rgba(0,0,0,0.9)] overflow-hidden sm:aspect-[4/3] sm:h-auto">
         {/* Top Header with Opponent Selector, Team Builder Button & Close */}
         <div className="battle-toolbar flex items-center justify-between gap-2 px-3 py-1.5 bg-[#2a1e16] border-b-2 border-amber-500/40 text-[10px]">
           <div className="battle-toolbar-actions flex items-center gap-2 min-w-0">
@@ -1008,7 +1008,7 @@ export function PokemonBattle({
         </div>
 
         {/* Bottom Control & Dialogue Panel */}
-        <div className="h-36 bg-[#18110b] border-t-4 border-amber-600/90 flex flex-col sm:flex-row p-2.5 gap-2">
+        <div className="min-h-36 h-36 bg-[#18110b] border-t-4 border-amber-600/90 flex flex-col sm:flex-row p-2.5 gap-2">
           {/* Battle Message Box */}
           <div className="flex-1 bg-[#24180e] border-2 border-amber-500/50 p-2.5 rounded flex items-center shadow-inner">
             <p className="pixel-font text-[9px] sm:text-[10px] text-amber-100 leading-relaxed">
@@ -1027,7 +1027,7 @@ export function PokemonBattle({
                     sound.playInteract();
                     setCurrentMenu("fight");
                   }}
-                  className="bg-rose-700 hover:bg-rose-600 text-white pixel-font text-[9px] font-bold rounded py-2 border border-rose-500/60 shadow active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="min-h-11 select-none touch-manipulation bg-rose-700/55 hover:bg-rose-600/65 active:bg-rose-600/75 text-white pixel-font text-[9px] font-bold rounded py-2 border border-rose-300/40 shadow active:scale-95 disabled:opacity-50 cursor-pointer backdrop-blur-sm"
                 >
                   ⚔️ LUTAR
                 </button>
@@ -1038,7 +1038,7 @@ export function PokemonBattle({
                     sound.playInteract();
                     setCurrentMenu("bag");
                   }}
-                  className="bg-amber-600 hover:bg-amber-500 text-white pixel-font text-[9px] font-bold rounded py-2 border border-amber-400/60 shadow active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="min-h-11 select-none touch-manipulation bg-amber-600/55 hover:bg-amber-500/65 active:bg-amber-500/75 text-white pixel-font text-[9px] font-bold rounded py-2 border border-amber-200/40 shadow active:scale-95 disabled:opacity-50 cursor-pointer backdrop-blur-sm"
                 >
                   🎒 BOLSA
                 </button>
@@ -1049,7 +1049,7 @@ export function PokemonBattle({
                     sound.playInteract();
                     setCurrentMenu("pokemon");
                   }}
-                  className="bg-emerald-700 hover:bg-emerald-600 text-white pixel-font text-[9px] font-bold rounded py-2 border border-emerald-500/60 shadow active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="min-h-11 select-none touch-manipulation bg-emerald-700/55 hover:bg-emerald-600/65 active:bg-emerald-600/75 text-white pixel-font text-[9px] font-bold rounded py-2 border border-emerald-300/40 shadow active:scale-95 disabled:opacity-50 cursor-pointer backdrop-blur-sm"
                 >
                   🔄 POKÉMON ({playerTeam.filter((p) => p.hp > 0).length})
                 </button>
@@ -1057,7 +1057,7 @@ export function PokemonBattle({
                   type="button"
                   disabled={isBusy}
                   onClick={handleRun}
-                  className="bg-sky-700 hover:bg-sky-600 text-white pixel-font text-[9px] font-bold rounded py-2 border border-sky-500/60 shadow active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="min-h-11 select-none touch-manipulation bg-sky-700/55 hover:bg-sky-600/65 active:bg-sky-600/75 text-white pixel-font text-[9px] font-bold rounded py-2 border border-sky-300/40 shadow active:scale-95 disabled:opacity-50 cursor-pointer backdrop-blur-sm"
                 >
                   🏃 FUGIR
                 </button>
