@@ -243,6 +243,7 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLElement && e.target.closest("input,textarea")) return;
+      if (e.repeat) return;
       if (["Enter", " ", "e", "E"].includes(e.key)) {
         e.preventDefault();
         e.stopPropagation();
