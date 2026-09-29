@@ -247,14 +247,29 @@ function World({
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
+  const [isPortraitMobile, setIsPortraitMobile] = useState(false);
 
-  // Auto-dismiss location toast banner after 2.4 seconds
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1024px) and (orientation: portrait)");
+    const update = () => setIsPortraitMobile(media.matches);
+    update();
+    media.addEventListener?.("change", update);
+    window.addEventListener("orientationchange", update);
+    window.addEventListener("resize", update);
+    return () => {
+      media.removeEventListener?.("change", update);
+      window.removeEventListener("orientationchange", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  // Auto-dismiss location toast quickly so rotation/navigation is not obscured.
   useEffect(() => {
     if (locationToast) {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
       toastTimerRef.current = setTimeout(() => {
         setLocationToast(null);
-      }, 2400);
+      }, 1200);
     }
     return () => {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -377,7 +392,7 @@ function World({
           if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
           toastTimerRef.current = setTimeout(() => {
             setLocationToast(null);
-          }, 2400);
+          }, 1200);
         }
       },
     });
@@ -598,24 +613,24 @@ function World({
         </div>
 
         {/* Pokemon GBA Location Toast Banner (auto-hides in ~2s or on click) */}
-        {locationToast && !screen && (
+        {locationToast && !screen && !isPortraitMobile && (
           <div
             onClick={() => setLocationToast(null)}
-            className="cursor-pointer absolute inset-x-0 top-2 z-30 flex justify-center px-2 transition-all duration-300 animate-in fade-in slide-in-from-top-3 sm:top-4"
+            className="cursor-pointer absolute inset-x-0 top-1 z-30 flex justify-center px-1.5 transition-opacity duration-100 animate-in fade-in slide-in-from-top-3 sm:top-4"
             title="Clique para fechar aviso"
           >
-            <div className="flex max-w-[96vw] flex-wrap items-center justify-center gap-2 bg-[#1a120e]/95 px-2.5 py-2 text-amber-100 pixel-frame-sm shadow-[0_8px_24px_rgba(0,0,0,0.6)] border-2 border-amber-500/70 backdrop-blur-sm hover:border-amber-400 transition-colors sm:gap-3 sm:px-4">
+            <div className="flex max-w-[94vw] flex-wrap items-center justify-center gap-1.5 bg-[#1a120e]/90 px-2 py-1.5 text-amber-100 pixel-frame-sm shadow-[0_8px_24px_rgba(0,0,0,0.6)] border-2 border-amber-500/70 backdrop-blur-sm hover:border-amber-400 transition-colors sm:gap-3 sm:px-4">
               <span className="text-xl select-none filter drop-shadow">{locationToast.icon}</span>
               <div>
                 <div className="game-footer-action-group flex items-center gap-2">
-                  <span className="pixel-font text-[10px] font-bold text-amber-300 tracking-wider">
+                  <span className="pixel-font text-[8px] font-bold text-amber-300 tracking-wider">
                     {locationToast.title}
                   </span>
                   <span className="pixel-font text-[7px] px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-200 border border-amber-400/40 font-bold">
                     {locationToast.badge}
                   </span>
                 </div>
-                <p className="pixel-font text-[8px] text-zinc-300 mt-0.5">
+                <p className="pixel-font text-[7px] text-zinc-300 mt-0.5">
                   {locationToast.subtitle}
                 </p>
               </div>
@@ -625,7 +640,7 @@ function World({
         )}
 
         {/* Action prompt text at top of screen (auto-dismisses after 3 seconds) */}
-        {prompt && promptVisible && !dialogue && (
+        {prompt && promptVisible && !dialogue && !isPortraitMobile && (
           <div
             onClick={() => setPromptVisible(false)}
             className="cursor-pointer absolute inset-x-0 top-2 z-30 flex justify-center px-2 animate-in fade-in slide-in-from-top-2 sm:top-3"
@@ -640,8 +655,8 @@ function World({
         )}
 
         {!prompt && !dialogue && scene && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center px-4">
-            <span className="pixel-font bg-card/90 text-card-foreground px-3 py-1.5 text-center text-[8px] leading-relaxed shadow-md border border-border">
+          <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center px-2">
+            <span className="pixel-font bg-card/90 text-card-foreground px-2 py-1 text-center text-[7px] leading-relaxed shadow-md border border-border">
               {scene.hint}
             </span>
           </div>
@@ -736,7 +751,7 @@ function World({
             ))}
           </div>
 
-          <div className="mobile-portrait-overlay" role="status" aria-live="polite">
+          {isPortraitMobile && <div className="mobile-portrait-overlay" role="status" aria-live="polite">
             <div className="mobile-portrait-card">
               <div className="text-4xl" aria-hidden="true">📱↻</div>
               <p className="pixel-font text-[11px] text-amber-100">Gire o celular</p>
