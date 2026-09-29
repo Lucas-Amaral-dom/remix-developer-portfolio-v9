@@ -548,7 +548,7 @@ function World({
                 key={target}
                 type="button"
                 onClick={() => quickTravel(target as Exclude<SceneId, "city">)}
-                className={`pixel-frame-sm flex min-h-9 shrink-0 items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-semibold text-amber-50 whitespace-nowrap transition-all hover:bg-amber-200/10 active:scale-95 ${
+                className={`pixel-frame-sm flex min-h-9 shrink-0 items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-semibold text-amber-50 whitespace-nowrap transition-all hover:bg-amber-200/10 active:scale-95 ${
                   scene?.id === target
                     ? "bg-primary/15 text-primary border-primary/60"
                     : "text-foreground"
@@ -827,6 +827,20 @@ function World({
           </div>
         )}
       </footer> : null}
+      <style>{`
+@media (max-width: 900px) and (pointer: coarse) {
+  .game-shell-header { padding: 6px 8px !important; }
+  .game-shell-header h1 { font-size: 12px !important; }
+  .game-shell-nav { gap: 6px !important; }
+  .game-shell-nav > button,
+  .game-shell-nav > div > button { min-height: 40px !important; padding: 7px 10px !important; font-size: 12px !important; }
+  .game-shell-footer { min-height: 76px; padding-top: 7px !important; padding-bottom: calc(7px + env(safe-area-inset-bottom)) !important; }
+  .game-shell-footer .game-footer-action-group { gap: 6px !important; }
+  .game-shell-footer .game-footer-action-group button,
+  .game-shell-footer > div > button { min-height: 40px !important; padding: 7px 10px !important; font-size: 11px !important; }
+  .mobile-quick-travel-btn { min-height: 40px !important; padding: 7px 10px !important; font-size: 11px !important; }
+}
+`}</style>
     </div>
   );
 }
