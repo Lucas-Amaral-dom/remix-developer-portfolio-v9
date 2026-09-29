@@ -690,6 +690,7 @@ function World({
           onClose={() => {
             setHealingOverlay({ isOpen: false, source: "nurse" });
             gameRef.current?.clearInteraction();
+            gameRef.current?.setPaused(false);
           }}
         />
 

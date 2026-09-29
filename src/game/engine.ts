@@ -24,7 +24,7 @@ import townBluehallSprite from "@/assets/build-town-bluehall.png";
 import townPinkcottageSprite from "@/assets/build-town-pinkcottage.png";
 import townOrangecottageSprite from "@/assets/build-town-orangecottage.png";
 import trainerOverworldAtlas from "@/assets/characters.png";
-import battleDawn from "@/assets/trainers/battle/dawn.png";
+import overworldDawn from "@/assets/trainers/overworld/dawn.png";
 import doorModernSprite from "@/assets/door-modern.png";
 import doorWoodSprite from "@/assets/door-wood.png";
 import desertSandTile from "@/assets/tiles/desert-sand.png";
@@ -152,7 +152,7 @@ const SPRITES: Record<string, string> = {
   "poke-delphox": DelphoxSprite,
   "poke-greninja": GreninjaSprite,
   "poke-yveltal": YveltalSprite,
-  "nurse-joy-world": battleDawn,
+  "nurse-joy-world": overworldDawn,
   "poke-primarina": PrimarinaSprite,
   "poke-golisopod": GolisopodSprite,
   "poke-mimikyu": MimikyuSprite,
