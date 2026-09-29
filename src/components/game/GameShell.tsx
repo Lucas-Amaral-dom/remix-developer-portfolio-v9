@@ -734,7 +734,7 @@ function World({
           }}
         />
 
-          {!battleActive && !dialogue && !screen && !celebrationOpen && !healingOverlay.isOpen && <div className="mobile-quick-travel" aria-label="Teleporte rápido para construções">
+          {!battleActive && !dialogue && !screen && !celebrationOpen && !healingOverlay.isOpen && <div className="mobile-quick-travel" aria-label="Atalhos rápidos para celular">
             {[
               ["home", "🏠", "Casa"],
               ["lab", "🧪", "Lab"],
@@ -752,6 +752,16 @@ function World({
                 <span>{label}</span>
               </button>
             ))}
+            <button
+              type="button"
+              onClick={() => setBattleOpponent("machop")}
+              className="mobile-quick-travel-btn mobile-battle-btn pixel-press"
+              aria-label="Iniciar batalha"
+              title="Iniciar batalha"
+            >
+              <span aria-hidden="true">⚔️</span>
+              <span>Batalha</span>
+            </button>
           </div>}
 
           {isPortraitMobile && !dialogue && !screen && !battleActive && (
