@@ -232,6 +232,8 @@ const PALETTE: Record<string, [number, number, number]> = {
 export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   // Own the canvas so it always fills the React container instead of the window.
   const canvas = document.createElement("canvas");
+  canvas.style.position = "absolute";
+  canvas.style.inset = "0";
   canvas.style.width = "100%";
   canvas.style.height = "100%";
   canvas.style.display = "block";
@@ -247,21 +249,45 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   // (address bar, orientation, fullscreen, keyboard/gesture UI). KAPLAY listens
   // to window resize, so explicitly forward container changes to it as well.
   let resizeFrame = 0;
+  let viewportSyncTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const syncViewport = () => {
+    cancelAnimationFrame(resizeFrame);
+    resizeFrame = requestAnimationFrame(() => {
+      if (root.clientWidth <= 1 || root.clientHeight <= 1) return;
+      // KAPLAY owns the internal backbuffer. Forward a real resize after the
+      // React container has settled so desktop fullscreen/restore cannot leave
+      // the renderer with a stale viewport and an otherwise healthy black canvas.
+      window.dispatchEvent(new Event("resize"));
+    });
+  };
+
+  const scheduleViewportSync = () => {
+    syncViewport();
+    if (viewportSyncTimer) clearTimeout(viewportSyncTimer);
+    viewportSyncTimer = setTimeout(() => {
+      viewportSyncTimer = null;
+      syncViewport();
+    }, 80);
+  };
+
   const resizeObserver =
     typeof ResizeObserver !== "undefined"
-      ? new ResizeObserver(() => {
-          cancelAnimationFrame(resizeFrame);
-          resizeFrame = requestAnimationFrame(() => {
-            if (root.clientWidth > 1 && root.clientHeight > 1) {
-              window.dispatchEvent(new Event("resize"));
-            }
-          });
-        })
+      ? new ResizeObserver(() => scheduleViewportSync())
       : null;
   resizeObserver?.observe(root);
 
+  window.addEventListener("resize", scheduleViewportSync);
+  window.addEventListener("orientationchange", scheduleViewportSync);
+  window.addEventListener("fullscreenchange", scheduleViewportSync);
+  window.addEventListener("pageshow", scheduleViewportSync);
+  document.addEventListener("visibilitychange", scheduleViewportSync);
+
   canvas.addEventListener("pointerdown", () => canvas.focus(), { passive: true });
-  requestAnimationFrame(() => canvas.focus());
+  requestAnimationFrame(() => {
+    canvas.focus();
+    scheduleViewportSync();
+  });
 
   const touchLayout =
     typeof window !== "undefined" &&
@@ -2340,6 +2366,12 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       transitionManager.destroy();
       resizeObserver?.disconnect();
       cancelAnimationFrame(resizeFrame);
+      if (viewportSyncTimer) clearTimeout(viewportSyncTimer);
+      window.removeEventListener("resize", scheduleViewportSync);
+      window.removeEventListener("orientationchange", scheduleViewportSync);
+      window.removeEventListener("fullscreenchange", scheduleViewportSync);
+      window.removeEventListener("pageshow", scheduleViewportSync);
+      document.removeEventListener("visibilitychange", scheduleViewportSync);
       k.quit();
       canvas.remove();
     },
