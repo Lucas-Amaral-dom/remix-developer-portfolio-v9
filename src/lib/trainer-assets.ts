@@ -93,8 +93,8 @@ export const TRAINER_VARIANT_BY_ID: Record<string, number> = {
   "Juíza da Arena": 11,
   Juíza: 11,
 
-  Lucas: 0,
-  "Lucas Amaral": 0,
+  Lucas: 5,
+  "Lucas Amaral": 5,
 };
 
 export const TRAINER_OVERWORLD_PORTRAITS_BY_VARIANT: Record<number, string> = {

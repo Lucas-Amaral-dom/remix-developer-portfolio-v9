@@ -171,6 +171,7 @@ const SPRITES: Record<string, string> = {
 // from being shown when an NPC changes direction.
 const TRAINER_DIR_INDEX: Record<Dir, number> = { down: 0, up: 1, left: 2, right: 3 };
 const TRAINER_FRAMES_PER_DIRECTION = 4;
+const PLAYER_TRAINER_VARIANT = 5; // Lucas — same variant used by battle/portfolio assets.
 const WALK_ANIMATION_FPS = 10;
 
 const trainerFrame = (variant: number, dir: Dir, walkFrame = 0) =>
@@ -1263,7 +1264,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
   function makePlayer(pos: { x: number; y: number }, initialFacing: Dir = "down") {
     const p = k.add([
-      k.sprite("trainer-chars", { frame: trainerFrame(0, initialFacing, 0) }),
+      k.sprite("trainer-chars", { frame: trainerFrame(PLAYER_TRAINER_VARIANT, initialFacing, 0) }),
       k.pos(pos.x * TILE + TILE / 2, pos.y * TILE + TILE),
       k.anchor("bot"),
       k.scale(1.0),
@@ -1971,16 +1972,16 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           player.walkAnimTime += k.dt();
           const walkFrame = Math.floor(player.walkAnimTime * WALK_ANIMATION_FPS) % 4;
           player.step = walkFrame;
-          player.frame = trainerFrame(0, player.facing, walkFrame);
+          player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, walkFrame);
         } else {
           player.walkAnimTime = 0;
           player.step = 0;
-          player.frame = trainerFrame(0, player.facing, 0);
+          player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, 0);
         }
       } else {
         player.walkAnimTime = 0;
         player.step = 0;
-        player.frame = trainerFrame(0, player.facing, 0);
+        player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, 0);
       }
 
       // Check nearest interaction or door
@@ -2147,7 +2148,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         doorObj.apply(1);
         if (activePlayer) {
           activePlayer.facing = "up";
-          activePlayer.frame = trainerFrame(0, "up");
+          activePlayer.frame = trainerFrame(PLAYER_TRAINER_VARIANT, "up");
           setPosX(activePlayer, doorObj.x * TILE + TILE / 2);
           setPosY(activePlayer, doorObj.y * TILE + 2);
         }
