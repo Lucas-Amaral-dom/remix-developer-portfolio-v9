@@ -256,7 +256,7 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
 
   return (
     <div
-      className="pointer-events-auto absolute inset-x-1 bottom-1 z-30 md:inset-x-8 md:bottom-6 cursor-pointer select-none sm:inset-x-2"
+      className="dialogue-box pointer-events-auto absolute inset-x-1 bottom-1 z-30 md:inset-x-8 md:bottom-6 cursor-pointer select-none sm:inset-x-2"
       onClick={(e) => {
         // Only advance if click was not inside an input, textarea or button
         if (e.target instanceof HTMLElement && e.target.closest("button,a,input,textarea")) return;
@@ -264,13 +264,13 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
       }}
     >
       <div className="bg-card/95 text-card-foreground pixel-frame relative p-2 pt-4 sm:p-3 sm:pt-5 md:p-5 md:pt-6 max-h-[46dvh] sm:max-h-[52dvh] md:max-h-[58dvh] overflow-y-auto">
-        <span className="pixel-font bg-primary text-primary-foreground absolute -top-2.5 left-2 px-1.5 py-0.5 text-[7px]">
+        <span className="pixel-font bg-primary text-primary-foreground absolute -top-2.5 left-2 px-1.5 py-0.5 text-[9px] sm:text-[8px]">
           {dialogue.speaker}
         </span>
 
         <div className="flex items-start gap-1.5 sm:gap-2.5 md:gap-4">
           <TrainerAvatar speaker={dialogue.speaker} battleOpponentId={battlePageOpponentId} />
-          <p className="flex-1 min-w-0 min-h-0 text-[11px] leading-5 whitespace-pre-line sm:text-[13px] sm:leading-6 md:text-base">
+          <p className="flex-1 min-w-0 min-h-0 text-[13px] leading-6 whitespace-pre-line sm:text-[13px] sm:leading-6 md:text-base">
             {shown}
             {!done && (
               <span className="ml-0.5 inline-block animate-[blink-cursor_1s_steps(1)_infinite]">
@@ -288,7 +288,7 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
                 href={l.href}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="pixel-font pixel-press bg-accent/70 text-accent-foreground min-h-9 px-2 py-1.5 text-[8px] sm:text-[10px] touch-manipulation select-none"
+                className="pixel-font pixel-press bg-accent/70 text-accent-foreground min-h-10 px-2.5 py-2 text-[10px] sm:text-[10px] touch-manipulation select-none"
               >
                 {l.label} ↗
               </a>
@@ -355,7 +355,7 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
         {done && dialogue.form && formSlot ? <div className="mt-4">{formSlot}</div> : null}
 
         <div className="mt-4 flex items-center justify-between gap-3">
-          <span className="pixel-font text-muted-foreground text-[8px] sm:text-[9px]">
+          <span className="pixel-font text-muted-foreground text-[10px] sm:text-[9px]">
             {page + 1}/{dialogue.pages.length} · A / Enter
           </span>
           <div className="flex gap-2">
@@ -369,3 +369,14 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
     </div>
   );
 }
+
+
+/* Mobile readability: keep the pixel aesthetic, but use comfortable touch targets and readable copy. */
+<style>{\`\
+@media (max-width: 900px) and (pointer: coarse) {\
+  .dialogue-box > div { padding: 12px 12px 10px !important; max-height: 52dvh !important; }\
+  .dialogue-box .pixel-font { letter-spacing: 0.01em; }\
+  .dialogue-box button, .dialogue-box a { min-height: 42px; font-size: 11px !important; }\
+  .dialogue-box .trainer-avatar { width: 52px !important; height: 64px !important; }\
+}\
+\`}</style>\
