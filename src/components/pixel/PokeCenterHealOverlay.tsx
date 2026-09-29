@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { sound } from "@/lib/sound";
 import { healPlayerTeam } from "@/lib/team-store";
+import charactersAtlas from "@/assets/characters.png";
 import type { PlayerPokemon } from "@/lib/battle/types";
 
 interface Props {
@@ -112,7 +113,7 @@ export function PokeCenterHealOverlay({
                 style={{
                   width: 56,
                   height: 84,
-                  backgroundImage: 'url("/src/assets/characters.png")',
+                  backgroundImage: `url(${charactersAtlas})`,
                   backgroundRepeat: "no-repeat",
                   backgroundSize: "224px 4032px",
                   backgroundPosition: "0 -1344px",
