@@ -1824,6 +1824,11 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         if (npc.item.label === "Enfermeira Joy") continue;
 
         if (npc.state === "idle") {
+          // Subtle breathing/bobbing keeps stationary trainers from looking frozen.
+          // It is intentionally tiny so the pixel-art silhouette stays stable.
+          const idleBob = Math.sin(now * 3.2 + npc.homeCol * 0.7 + npc.homeRow * 0.4) * 0.45;
+          setPosY(npc.spr, npc.curRow * TILE + TILE + idleBob);
+          setPosY(npc.shadow, npc.curRow * TILE + TILE - 2);
           // Idle sprites only change frame when direction/state changes. Rewriting
           // the frame and opacity every animation tick created unnecessary work.
           npc.idleTimer -= dt;
