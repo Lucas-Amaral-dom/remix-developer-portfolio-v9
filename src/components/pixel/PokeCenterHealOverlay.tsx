@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { sound } from "@/lib/sound";
 import { healPlayerTeam } from "@/lib/team-store";
-import battleDawn from "@/assets/trainers/battle/dawn.png";
+import overworldDawn from "@/assets/trainers/overworld/dawn.png";
 import type { PlayerPokemon } from "@/lib/battle/types";
 
 interface Props {
@@ -61,6 +61,8 @@ export function PokeCenterHealOverlay({
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (["Enter", " ", "Escape"].includes(e.key) && isDone) {
+        e.preventDefault();
+        e.stopPropagation();
         onClose();
       }
     };
@@ -104,7 +106,7 @@ export function PokeCenterHealOverlay({
           {/* Nurse Joy Avatar */}
           <div className="flex items-center gap-3 mb-4">
             <img
-              src={source === "nurse" ? battleDawn : "https://play.pokemonshowdown.com/sprites/trainers/beauty.png"}
+              src={source === "nurse" ? overworldDawn : "https://play.pokemonshowdown.com/sprites/trainers/beauty.png"}
               alt="Nurse Joy"
               className="w-14 h-14 object-contain filter drop-shadow animate-bounce"
               style={{ imageRendering: "pixelated" }}
