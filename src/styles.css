@@ -777,3 +777,97 @@
     font-size: 7px;
   }
 }
+
+@media (max-width: 1024px) and (orientation: landscape) {
+  .battle-stage {
+    position: relative;
+  }
+
+  /* Keep the two combatants inside the field even when the viewport is short. */
+  .battle-stage > .absolute.top-6.right-6,
+  .battle-stage > .absolute.top-6.right-6.md\:right-12 {
+    top: 7%;
+    right: 5%;
+    width: min(31vw, 220px);
+    height: 38%;
+  }
+
+  .battle-stage > .absolute.top-6.right-6 img {
+    width: clamp(82px, 16vw, 132px);
+    height: clamp(82px, 16vw, 132px);
+  }
+
+  .battle-stage > .absolute.bottom-4.left-6,
+  .battle-stage > .absolute.bottom-4.left-6.md\:left-12 {
+    bottom: 5%;
+    left: 5%;
+    width: min(34vw, 240px);
+    height: 42%;
+  }
+
+  .battle-stage > .absolute.bottom-4.left-6 img {
+    width: clamp(92px, 18vw, 148px);
+    height: clamp(92px, 18vw, 148px);
+  }
+
+  .battle-stage > .absolute.top-4.left-4,
+  .battle-stage > .absolute.top-4.left-4.md\:left-6 {
+    top: 6%;
+    left: 3%;
+    width: min(38vw, 230px);
+    padding: 6px;
+  }
+
+  .battle-stage > .absolute.bottom-6.right-4,
+  .battle-stage > .absolute.bottom-6.right-4.md\:right-8 {
+    bottom: 5%;
+    right: 3%;
+    width: min(38vw, 230px);
+    padding: 6px;
+  }
+}
+
+@media (max-width: 640px) and (orientation: landscape) {
+  .battle-stage > .absolute.top-6.right-6,
+  .battle-stage > .absolute.top-6.right-6.md\:right-12 {
+    top: 8%;
+    right: 3%;
+    width: 30vw;
+    height: 35%;
+  }
+
+  .battle-stage > .absolute.top-6.right-6 img {
+    width: clamp(70px, 15vw, 110px);
+    height: clamp(70px, 15vw, 110px);
+  }
+
+  .battle-stage > .absolute.bottom-4.left-6,
+  .battle-stage > .absolute.bottom-4.left-6.md\:left-12 {
+    bottom: 4%;
+    left: 3%;
+    width: 32vw;
+    height: 38%;
+  }
+
+  .battle-stage > .absolute.bottom-4.left-6 img {
+    width: clamp(76px, 17vw, 120px);
+    height: clamp(76px, 17vw, 120px);
+  }
+
+  .battle-stage > .absolute.top-4.left-4,
+  .battle-stage > .absolute.top-4.left-4.md\:left-6 {
+    top: 5%;
+    left: 2%;
+    width: 36vw;
+    padding: 4px;
+    font-size: 7px;
+  }
+
+  .battle-stage > .absolute.bottom-6.right-4,
+  .battle-stage > .absolute.bottom-6.right-4.md\:right-8 {
+    bottom: 4%;
+    right: 2%;
+    width: 36vw;
+    padding: 4px;
+  }
+}
