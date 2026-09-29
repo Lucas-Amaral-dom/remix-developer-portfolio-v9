@@ -263,7 +263,7 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
         advance();
       }}
     >
-      <div className="bg-card/95 text-card-foreground pixel-frame relative p-2 pt-4 sm:p-3 sm:pt-5 md:p-5 md:pt-6 max-h-[46dvh] sm:max-h-[52dvh] md:max-h-[58dvh] overflow-y-auto">
+      <div className="bg-card/95 text-card-foreground pixel-frame relative p-3 pt-5 sm:p-3 sm:pt-5 md:p-5 md:pt-6 max-h-[52dvh] sm:max-h-[52dvh] md:max-h-[58dvh] overflow-y-auto">
         <span className="pixel-font bg-primary text-primary-foreground absolute -top-2.5 left-2 px-1.5 py-0.5 text-[9px] sm:text-[8px]">
           {dialogue.speaker}
         </span>
@@ -288,7 +288,7 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
                 href={l.href}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="pixel-font pixel-press bg-accent/70 text-accent-foreground min-h-10 px-2.5 py-2 text-[10px] sm:text-[10px] touch-manipulation select-none"
+                className="pixel-font pixel-press bg-accent/70 text-accent-foreground min-h-11 px-2.5 py-2 text-[10px] sm:text-[10px] touch-manipulation select-none"
               >
                 {l.label} ↗
               </a>
@@ -306,7 +306,7 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
                 onHeal?.(current.healAction!);
                 advance();
               }}
-              className="pixel-font pixel-press flex items-center gap-2 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2.5 text-xs shadow-md border-2 border-emerald-950 rounded-sm font-bold cursor-pointer transition-transform active:scale-95 animate-pulse"
+              className="pixel-font pixel-press flex items-center gap-2 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-500 hover:to-teal-500 text-white min-h-11 px-4 py-2.5 text-[11px] sm:text-xs shadow-md border-2 border-emerald-950 rounded-sm font-bold cursor-pointer transition-transform active:scale-95 animate-pulse"
             >
               <span className="text-sm">💖</span>
               <span>{current.healLabel || "Curar meus Pokémon!"}</span>
@@ -327,7 +327,7 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
                   onClose();
                 }
               }}
-              className="pixel-font pixel-press flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 via-amber-600 to-red-600 hover:from-red-500 hover:to-amber-500 text-white px-3.5 py-2.5 text-xs shadow-md border-2 border-red-950 rounded-sm font-bold cursor-pointer transition-transform active:scale-95 animate-pulse"
+              className="pixel-font pixel-press flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 via-amber-600 to-red-600 hover:from-red-500 hover:to-amber-500 text-white min-h-11 px-3.5 py-2.5 text-[11px] sm:text-xs shadow-md border-2 border-red-950 rounded-sm font-bold cursor-pointer transition-transform active:scale-95 animate-pulse"
             >
               <span className="text-sm">⚔️</span>
               <span>{current.battleLabel || "Batalhar Agora!"}</span>
@@ -369,14 +369,3 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
     </div>
   );
 }
-
-
-/* Mobile readability: keep the pixel aesthetic, but use comfortable touch targets and readable copy. */
-<style>{\`\
-@media (max-width: 900px) and (pointer: coarse) {\
-  .dialogue-box > div { padding: 12px 12px 10px !important; max-height: 52dvh !important; }\
-  .dialogue-box .pixel-font { letter-spacing: 0.01em; }\
-  .dialogue-box button, .dialogue-box a { min-height: 42px; font-size: 11px !important; }\
-  .dialogue-box .trainer-avatar { width: 52px !important; height: 64px !important; }\
-}\
-\`}</style>\
