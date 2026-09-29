@@ -28,7 +28,9 @@ import overworldSerena from "@/assets/trainers/overworld/serena.png";
  * Cada variante ocupa 16 frames: 4 direções × 4 poses.
  * O índice precisa permanecer alinhado com os retratos de batalha locais.
  */
-export const TRAINER_VARIANTS = 12;
+// `characters.png` contains 32 complete trainer variants (4 directions × 4 frames).
+// Keep all of them available so city NPCs do not recycle the first 12 sprites.
+export const TRAINER_VARIANTS = 32;
 
 export const TRAINER_VARIANT_NAMES = [
   "Red",
@@ -46,37 +48,48 @@ export const TRAINER_VARIANT_NAMES = [
 ] as const;
 
 export const TRAINER_VARIANT_BY_ID: Record<string, number> = {
-  // Estes índices são os mesmos usados por world.ts para os NPCs visíveis.
-  Lucas: 0,
-  "Lucas Amaral": 2,
-
+  // Cidade: variantes distintas para reduzir reciclagem visual.
   "Guia do Oásis": 0,
   "Viajante do Deserto": 1,
-  "Pescadora do Oásis": 4,
   "Lutador de Sparring": 2,
   "Campista Dev": 3,
+  "Pescadora do Oásis": 4,
   "Desenvolvedor Full Stack": 5,
   "Mecânica de Software": 6,
-  "Ranger do Santuário": 6,
+  "Construtor do Workshop": 7,
   "Mercador de Frutas e Itens": 8,
   "Mestre de Batalhas": 9,
-  "Pesquisadora do Oásis": 6,
-  "Construtor do Workshop": 7,
+  "Pesquisadora do Oásis": 10,
+  "Ranger do Santuário": 11,
+  "Turista do Deserto": 12,
+  "Viajante do Oásis": 13,
+  "Treinador da Praça": 14,
+  "Exploradora do Deserto": 15,
+  "Artista do Oásis": 16,
+  "Pesquisador de Campo": 17,
 
-  "Turista do Deserto": 6,
-  "Viajante do Oásis": 1,
-  "Treinador da Praça": 0,
-  "Exploradora do Deserto": 2,
-  "Artista do Oásis": 4,
-  "Pesquisador de Campo": 7,
-
-  Atendente: 1,
-  "Instrutor SENAI": 9,
+  // Interiores / NPCs de apoio podem reutilizar variantes, mas nunca alteram
+  // a identidade dos NPCs de batalha acima.
+  Lucas: 18,
+  "Lucas Amaral": 18,
+  Atendente: 19,
+  "Instrutor SENAI": 21,
   "Hoteleira do Oásis": 5,
-  "Enfermeira Joy": 4,
-  "Arquiteto de Software": 7,
-  "Juíza da Arena": 6,
-  "Curador de Créditos": 10,
+  "Enfermeira Joy": 24,
+  "Arquiteto de Software": 23,
+  "Juíza da Arena": 22,
+  "Curador de Créditos": 25,
+
+  // Aliases de diálogo e de listas de batalha precisam apontar para o mesmo personagem.
+  Guia: 0,
+  "Guia da Cidade": 0,
+  "Lutador do Sparring Ring": 2,
+  "Desenvolvedor da Oficina": 5,
+  "Pesquisador do Oásis": 10,
+  "Mercador do Bazar": 8,
+  "Mestre da Arena": 9,
+  Hoteleira: 5,
+  "Juíza": 22,
 };
 
 export const TRAINER_OVERWORLD_PORTRAITS_BY_VARIANT: Record<number, string> = {
