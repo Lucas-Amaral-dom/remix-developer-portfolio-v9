@@ -668,3 +668,112 @@
     min-height: 42px;
   }
 }
+
+/* Fully transparent mobile controls: the map remains visible behind every control. */
+.game-shell-root .game-shell-footer,
+.game-shell-root .mobile-quick-travel-btn,
+.game-shell-root .game-shell-header button,
+.game-shell-root .game-shell-header summary {
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.game-shell-root .game-shell-footer button,
+.game-shell-root .game-shell-footer a {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+.game-shell-root .mobile-quick-travel-btn {
+  border-color: oklch(1 0 0 / 0.28);
+  color: white;
+  text-shadow: 0 1px 2px oklch(0 0 0 / 0.9);
+}
+
+@media (max-width: 1024px) {
+  .game-shell-footer {
+    gap: 8px;
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+  }
+
+  .game-footer-action-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 44vw;
+    overflow: visible;
+  }
+
+  .game-footer-action-group button {
+    min-width: 0;
+    min-height: 34px;
+    padding: 4px 7px;
+    font-size: 8px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .game-footer-action-group {
+    max-width: 46vw;
+    gap: 4px;
+  }
+
+  .game-footer-action-group button {
+    min-height: 32px;
+    padding: 3px 5px;
+    font-size: 7px;
+  }
+}
+
+/* Battle stage: responsive GBA-like composition for short mobile landscape screens. */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .battle-shell {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    border-width: 2px;
+    border-radius: 0;
+  }
+
+  .battle-shell > .battle-toolbar {
+    min-height: 34px;
+    padding: 3px 6px;
+  }
+
+  .battle-shell .battle-stage,
+  .battle-shell > .relative.flex-1 {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 640px) and (orientation: landscape) {
+  .battle-shell > .battle-toolbar {
+    min-height: 30px;
+    font-size: 7px;
+  }
+
+  .battle-shell > .battle-toolbar .battle-toolbar-actions {
+    gap: 3px;
+  }
+
+  .battle-shell > .battle-toolbar .battle-toolbar-actions > span {
+    font-size: 7px;
+  }
+
+  .battle-shell > .relative.flex-1 {
+    min-height: 0;
+  }
+
+  .battle-shell .battle-toolbar-actions button,
+  .battle-shell .battle-toolbar-actions select {
+    min-height: 26px;
+    padding: 2px 4px;
+    font-size: 7px;
+  }
+}
