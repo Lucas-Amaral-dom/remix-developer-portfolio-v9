@@ -73,7 +73,7 @@ export const TRAINER_VARIANT_BY_ID: Record<string, number> = {
   "Mecânica de Software": 6,
   "Ranger do Santuário": 6,
   "Turista do Deserto": 6,
-  "Pesquisadora do Oásis": 6,
+  "Pesquisadora do Oásis": 10,
 
   "Construtor do Workshop": 7,
   "Pesquisador de Campo": 7,
