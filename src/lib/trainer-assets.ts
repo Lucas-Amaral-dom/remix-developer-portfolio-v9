@@ -70,54 +70,57 @@ export const TRAINER_ATLAS_VARIANT_BY_NAME = Object.fromEntries(
 
 
 export const TRAINER_VARIANT_BY_ID: Record<string, number> = {
-  // Variantes reais disponíveis no atlas characters.png (0–11).
-  "Guia do Oásis": 0,
-  "Guia da Cidade": 0,
-  Guia: 0,
-  "Viajante do Deserto": 1,
-  "Viajante do Oásis": 1,
-  Atendente: 1,
+  // Role -> canonical trainer from characters.png. The same canonical
+  // identity is used to select the matching local battle sprite.
+  "Guia do Oásis": TRAINER_ATLAS_VARIANT_BY_NAME.Red,
+  "Guia da Cidade": TRAINER_ATLAS_VARIANT_BY_NAME.Red,
+  Guia: TRAINER_ATLAS_VARIANT_BY_NAME.Red,
 
-  "Lutador de Sparring": 2,
-  "Lutador do Sparring Ring": 2,
-  "Exploradora do Deserto": 2,
+  "Viajante do Deserto": TRAINER_ATLAS_VARIANT_BY_NAME.Leaf,
+  "Viajante do Oásis": TRAINER_ATLAS_VARIANT_BY_NAME.Leaf,
+  Atendente: TRAINER_ATLAS_VARIANT_BY_NAME.Cynthia,
 
-  "Campista Dev": 3,
+  "Lutador de Sparring": TRAINER_ATLAS_VARIANT_BY_NAME.Brendan,
+  "Lutador do Sparring Ring": TRAINER_ATLAS_VARIANT_BY_NAME.Brendan,
+  "Treinador da Praça": TRAINER_ATLAS_VARIANT_BY_NAME.Brendan,
+  "Exploradora do Deserto": TRAINER_ATLAS_VARIANT_BY_NAME.Dawn,
 
-  "Pescadora do Oásis": 4,
-  "Artista do Oásis": 4,
-  "Enfermeira Joy": 4,
+  "Campista Dev": TRAINER_ATLAS_VARIANT_BY_NAME.May,
+  "Hoteleira do Oásis": TRAINER_ATLAS_VARIANT_BY_NAME.May,
 
-  "Desenvolvedor Full Stack": 5,
-  "Desenvolvedor da Oficina": 5,
-  "Hoteleira do Oásis": 5,
+  "Pescadora do Oásis": TRAINER_ATLAS_VARIANT_BY_NAME.Dawn,
+  "Artista do Oásis": TRAINER_ATLAS_VARIANT_BY_NAME.Serena,
+  "Enfermeira Joy": TRAINER_ATLAS_VARIANT_BY_NAME.Dawn,
 
-  "Mecânica de Software": 6,
-  "Ranger do Santuário": 6,
-  "Turista do Deserto": 6,
-  "Pesquisadora do Oásis": 10,
+  "Desenvolvedor Full Stack": TRAINER_ATLAS_VARIANT_BY_NAME.Lucas,
+  "Desenvolvedor da Oficina": TRAINER_ATLAS_VARIANT_BY_NAME.Lucas,
+  "Arquiteto de Software": TRAINER_ATLAS_VARIANT_BY_NAME.Lucas,
 
-  "Construtor do Workshop": 7,
-  "Pesquisador de Campo": 7,
-  "Treinador da Praça": 0,
-  "Arquiteto de Software": 7,
+  "Mecânica de Software": TRAINER_ATLAS_VARIANT_BY_NAME.Serena,
+  "Ranger do Santuário": TRAINER_ATLAS_VARIANT_BY_NAME.Ethan,
+  "Turista do Deserto": TRAINER_ATLAS_VARIANT_BY_NAME.Red,
+  "Pesquisadora do Oásis": TRAINER_ATLAS_VARIANT_BY_NAME.Hilbert,
 
-  "Mercador de Frutas e Itens": 8,
-  "Mercador do Bazar": 8,
+  "Construtor do Workshop": TRAINER_ATLAS_VARIANT_BY_NAME.Hilda,
+  "Pesquisador de Campo": TRAINER_ATLAS_VARIANT_BY_NAME.Ethan,
 
-  "Mestre de Batalhas": 9,
-  "Mestre da Arena": 9,
-  "Instrutor SENAI": 9,
+  "Mercador de Frutas e Itens": TRAINER_ATLAS_VARIANT_BY_NAME.Cynthia,
+  "Mercador do Bazar": TRAINER_ATLAS_VARIANT_BY_NAME.Cynthia,
 
-  "Curador de Créditos": 10,
-  "Pesquisador do Oásis": 10,
+  "Mestre de Batalhas": TRAINER_ATLAS_VARIANT_BY_NAME.Calem,
+  "Mestre da Arena": TRAINER_ATLAS_VARIANT_BY_NAME.Calem,
+  "Instrutor SENAI": TRAINER_ATLAS_VARIANT_BY_NAME.Hilbert,
 
-  "Juíza da Arena": 11,
-  Juíza: 11,
+  "Curador de Créditos": TRAINER_ATLAS_VARIANT_BY_NAME.Calem,
+  "Pesquisador do Oásis": TRAINER_ATLAS_VARIANT_BY_NAME.Hilbert,
 
-  // The protagonist uses Red as the stable fallback with full walking frames.
-  Lucas: 0,
-  "Lucas Amaral": 0,
+  "Juíza da Arena": TRAINER_ATLAS_VARIANT_BY_NAME.Hilda,
+  Juíza: TRAINER_ATLAS_VARIANT_BY_NAME.Hilda,
+
+  // The playable protagonist remains Red because that is the stable
+  // fully animated 4-direction fallback currently available.
+  Lucas: TRAINER_ATLAS_VARIANT_BY_NAME.Red,
+  "Lucas Amaral": TRAINER_ATLAS_VARIANT_BY_NAME.Red,
 };
 
 export const TRAINER_OVERWORLD_PORTRAITS_BY_VARIANT: Record<number, string> = {
@@ -164,26 +167,26 @@ export const BATTLE_TRAINER_SPRITES_BY_VARIANT: Record<number, string> = {
  * O mesmo ID liga NPC do mapa, retrato de conversa e retrato da batalha.
  */
 export const TRAINER_VARIANT_BY_OPPONENT_ID: Record<string, number> = {
-  machop: 2,
-  psyduck: 4,
-  trapinch: 6,
-  charmander: 3,
-  porygon: 5,
-  eevee: 6,
-  arcanine: 9,
-  flygon: 1,
-  pikachu: 0,
-  merchant: 8,
-  bulbasaur: 10,
-  chansey: 5,
+  machop: TRAINER_ATLAS_VARIANT_BY_NAME.Brendan,
+  psyduck: TRAINER_ATLAS_VARIANT_BY_NAME.Dawn,
+  trapinch: TRAINER_ATLAS_VARIANT_BY_NAME.Serena,
+  charmander: TRAINER_ATLAS_VARIANT_BY_NAME.May,
+  porygon: TRAINER_ATLAS_VARIANT_BY_NAME.Lucas,
+  eevee: TRAINER_ATLAS_VARIANT_BY_NAME.Serena,
+  arcanine: TRAINER_ATLAS_VARIANT_BY_NAME.Calem,
+  flygon: TRAINER_ATLAS_VARIANT_BY_NAME.Leaf,
+  pikachu: TRAINER_ATLAS_VARIANT_BY_NAME.Red,
+  merchant: TRAINER_ATLAS_VARIANT_BY_NAME.Cynthia,
+  bulbasaur: TRAINER_ATLAS_VARIANT_BY_NAME.Hilbert,
+  chansey: TRAINER_ATLAS_VARIANT_BY_NAME.May,
 
   // Lower-area trainers.
-  builder: 7,
-  tourist: 6,
-  "oasis-traveler": 1,
-  "square-trainer": 0,
-  explorer: 2,
-  artist: 4,
-  "field-researcher": 7,
-  "oasis-researcher": 10,
+  builder: TRAINER_ATLAS_VARIANT_BY_NAME.Hilda,
+  tourist: TRAINER_ATLAS_VARIANT_BY_NAME.Red,
+  "oasis-traveler": TRAINER_ATLAS_VARIANT_BY_NAME.Leaf,
+  "square-trainer": TRAINER_ATLAS_VARIANT_BY_NAME.Brendan,
+  explorer: TRAINER_ATLAS_VARIANT_BY_NAME.Dawn,
+  artist: TRAINER_ATLAS_VARIANT_BY_NAME.Serena,
+  "field-researcher": TRAINER_ATLAS_VARIANT_BY_NAME.Ethan,
+  "oasis-researcher": TRAINER_ATLAS_VARIANT_BY_NAME.Hilbert,
 };
