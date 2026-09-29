@@ -1641,8 +1641,8 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       // old walking/idle switch to leave a visible duplicate or halo.
       const spr = k.add([
         k.sprite("trainer-chars", {
-          // Nurse Joy is the Dawn block from characters.png: position 5 (index 4).
-          frame: trainerFrame(isNurseJoy ? 4 : trainerVariant, isNurseJoy ? "down" : face, 0),
+          // Nurse Joy is the Dawn block from characters.png: position 6 (index 5).
+          frame: trainerFrame(isNurseJoy ? 5 : trainerVariant, isNurseJoy ? "down" : face, 0),
         }),
         k.pos(px, py),
         k.anchor("bot"),
@@ -1819,8 +1819,8 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       for (const npc of activeNpcs) {
         if (state.paused || npc.state === "talking") continue;
 
-        // Nurse Joy is stationed at the healing counter. Use the Dawn overworld
-        // block from characters.png and keep it facing down; no battle sprite involved.
+        // Nurse Joy uses the actual Dawn overworld block from characters.png:
+        // the 6th physical block (zero-based index 5), not the yellow-hat block at index 4.
         if (npc.item.label === "Enfermeira Joy") continue;
 
         if (npc.state === "idle") {

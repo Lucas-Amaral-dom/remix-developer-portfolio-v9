@@ -47,15 +47,15 @@ export const TRAINER_VARIANT_NAMES = [
   "Hilda",
 ] as const;/**
  * Physical positions in characters.png, using human-friendly 1-based numbering.
- * Position 5 is Dawn; position 6 is Lucas.
+ * Position 5 is Lucas; position 6 is Dawn.
  */
 export const TRAINER_ATLAS_POSITION_BY_NAME = {
   Red: 1,
   Leaf: 2,
   Brendan: 3,
   May: 4,
-  Dawn: 5,
-  Lucas: 6,
+  Dawn: 6,
+  Lucas: 5,
   Serena: 7,
   Ethan: 8,
   Cynthia: 9,

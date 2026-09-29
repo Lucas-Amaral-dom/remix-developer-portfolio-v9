@@ -109,14 +109,14 @@ export function PokeCenterHealOverlay({
               <div
                 role="img"
                 aria-label="Enfermeira Joy — Dawn"
-                className="h-14 w-14 animate-bounce drop-shadow"
+                className="h-[84px] w-14 animate-bounce drop-shadow"
                 style={{
                   width: 56,
                   height: 84,
                   backgroundImage: `url(${charactersAtlas})`,
                   backgroundRepeat: "no-repeat",
                   backgroundSize: "224px 4032px",
-                  backgroundPosition: "0 -1344px",
+                  backgroundPosition: "0 -1680px",
                   imageRendering: "pixelated",
                 }}
               />
