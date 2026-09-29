@@ -106,14 +106,14 @@ function TrainerAvatar({
       {isPokemonSpeaker ? (
         <div
           aria-label={speaker}
-          className="flex h-24 w-16 shrink-0 items-center justify-center overflow-hidden border-2 border-[var(--pixel-border-deep)] bg-gradient-to-b from-sky-950/40 via-cyan-900/20 to-black/50 shadow-md"
+          className="flex h-16 w-12 shrink-0 items-center justify-center overflow-hidden border-2 border-[var(--pixel-border-deep)] bg-gradient-to-b from-sky-950/40 via-cyan-900/20 to-black/50 shadow-md"
         >
           {pokemonPortrait ? (
             <img
               src={pokemonPortrait}
               alt={speaker}
               loading="lazy"
-              className="h-16 w-16 object-contain"
+              className="h-10 w-10 object-contain"
               style={{ imageRendering: "pixelated" }}
               referrerPolicy="no-referrer"
             />
@@ -130,7 +130,7 @@ function TrainerAvatar({
               alt={`${speaker} em batalha`}
               loading="eager"
               decoding="sync"
-              className="h-20 w-14 object-contain"
+              className="h-16 w-11 object-contain"
               style={{ imageRendering: "pixelated" }}
               referrerPolicy="no-referrer"
               draggable={false}
@@ -149,7 +149,7 @@ function TrainerAvatar({
       )}
 
       {hasBattlePreview && (
-        <div className="flex min-h-24 min-w-20 flex-col items-center justify-center gap-0.5 border-2 border-[var(--pixel-border-deep)] bg-black/60 px-1.5 py-1 shadow-md">
+        <div className="flex min-h-16 min-w-14 flex-col items-center justify-center gap-0.5 border-2 border-[var(--pixel-border-deep)] bg-black/60 px-1.5 py-1 shadow-md">
           {pokemonBattleSprite ? (
             <img
               src={pokemonBattleSprite}
@@ -263,14 +263,14 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
         advance();
       }}
     >
-      <div className="bg-card/95 text-card-foreground pixel-frame relative p-3 pt-5 sm:p-4 sm:pt-6 md:p-6 md:pt-7 max-h-[58dvh] overflow-y-auto">
-        <span className="pixel-font bg-primary text-primary-foreground absolute -top-3 left-3 px-2 py-1 text-[9px]">
+      <div className="bg-card/95 text-card-foreground pixel-frame relative p-2 pt-4 sm:p-3 sm:pt-5 md:p-5 md:pt-6 max-h-[46dvh] sm:max-h-[52dvh] md:max-h-[58dvh] overflow-y-auto">
+        <span className="pixel-font bg-primary text-primary-foreground absolute -top-2.5 left-2 px-1.5 py-0.5 text-[7px]">
           {dialogue.speaker}
         </span>
 
-        <div className="flex items-start gap-2.5 sm:gap-3.5 md:gap-5">
+        <div className="flex items-start gap-1.5 sm:gap-2.5 md:gap-4">
           <TrainerAvatar speaker={dialogue.speaker} battleOpponentId={battlePageOpponentId} />
-          <p className="flex-1 min-w-0 min-h-[4rem] text-[13px] leading-6 whitespace-pre-line sm:text-sm md:text-base">
+          <p className="flex-1 min-w-0 min-h-0 text-[11px] leading-5 whitespace-pre-line sm:text-[13px] sm:leading-6 md:text-base">
             {shown}
             {!done && (
               <span className="ml-0.5 inline-block animate-[blink-cursor_1s_steps(1)_infinite]">
@@ -288,7 +288,7 @@ export function DialogueBox({ dialogue, onClose, onStartBattle, onHeal, formSlot
                 href={l.href}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="pixel-font pixel-press bg-accent/85 text-accent-foreground min-h-11 px-3 py-2.5 text-[10px] sm:text-[11px] touch-manipulation"
+                className="pixel-font pixel-press bg-accent/70 text-accent-foreground min-h-9 px-2 py-1.5 text-[8px] sm:text-[10px] touch-manipulation select-none"
               >
                 {l.label} ↗
               </a>
