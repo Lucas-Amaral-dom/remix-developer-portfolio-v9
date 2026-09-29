@@ -276,6 +276,10 @@
 /* Full-screen game presentation on touch devices in landscape. */
 .game-shell-root {
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .game-shell-stage,
@@ -470,5 +474,46 @@
   .game-shell-root a {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+  }
+}
+
+/* Mobile game UX: quick travel stays visible without covering the map. */
+.mobile-quick-travel {
+  display: none;
+}
+@media (max-width: 1024px) and (orientation: landscape) {
+  .mobile-quick-travel {
+    position: absolute;
+    top: max(48px, calc(env(safe-area-inset-top) + 42px));
+    left: max(8px, env(safe-area-inset-left));
+    z-index: 58;
+    display: flex;
+    gap: 6px;
+    max-width: calc(100vw - 16px);
+    overflow-x: auto;
+    padding: 2px;
+    pointer-events: auto;
+  }
+  .mobile-quick-travel-btn {
+    display: inline-flex;
+    min-width: 58px;
+    min-height: 38px;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex: 0 0 auto;
+    border: 1px solid oklch(1 0 0 / 0.22);
+    background: oklch(0.12 0.03 40 / 0.42);
+    color: white;
+    border-radius: 4px;
+    padding: 5px 8px;
+    font-family: inherit;
+    font-size: 9px;
+    backdrop-filter: blur(2px);
+    touch-action: manipulation;
+  }
+  .mobile-quick-travel-btn:active {
+    transform: scale(0.96);
+    background: oklch(0.18 0.04 40 / 0.62);
   }
 }

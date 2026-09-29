@@ -31,7 +31,7 @@ export function DPad({ onDir, onAction, actionLabel }: Props) {
         onDir(null);
       }}
       onContextMenu={(e) => e.preventDefault()}
-      className="game-dpad-btn pixel-press bg-card text-card-foreground pixel-font flex h-12 w-12 items-center justify-center text-[11px] select-none touch-none"
+      className="game-dpad-btn pixel-press bg-card/35 hover:bg-card/50 border border-white/20 text-card-foreground pixel-font flex h-14 w-14 items-center justify-center text-[13px] select-none touch-none touch-manipulation backdrop-blur-[2px]"
     >
       {glyph}
     </button>
@@ -69,7 +69,7 @@ export function DPad({ onDir, onAction, actionLabel }: Props) {
           }
         }}
         onContextMenu={(e) => e.preventDefault()}
-        className="game-dpad-action pixel-press bg-primary text-primary-foreground pixel-font flex h-16 w-16 items-center justify-center rounded-full text-[11px] select-none touch-none"
+        className="game-dpad-action pixel-press bg-primary/70 hover:bg-primary/80 border-2 border-white/25 text-primary-foreground pixel-font flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full text-[12px] select-none touch-none touch-manipulation backdrop-blur-[2px]"
       >
         {actionLabel}
       </button>

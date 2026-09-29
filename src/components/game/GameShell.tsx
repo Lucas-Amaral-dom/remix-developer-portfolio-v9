@@ -710,6 +710,26 @@ function World({
           }}
         />
 
+          <div className="mobile-quick-travel" aria-label="Teleporte rápido para construções">
+            {[
+              ["home", "🏠", "Casa"],
+              ["lab", "🧪", "Lab"],
+              ["arena", "⚔️", "Arena"],
+              ["shop", "🛒", "Loja"],
+            ].map(([target, icon, label]) => (
+              <button
+                key={target}
+                type="button"
+                onClick={() => quickTravel(target as Exclude<SceneId, "city">)}
+                className="mobile-quick-travel-btn pixel-press"
+                aria-label={`Ir para ${label}`}
+              >
+                <span aria-hidden="true">{icon}</span>
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
+
           <div className="mobile-portrait-overlay" role="status" aria-live="polite">
             <div className="mobile-portrait-card">
               <div className="text-4xl" aria-hidden="true">📱↻</div>

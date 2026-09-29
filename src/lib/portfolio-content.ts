@@ -503,11 +503,32 @@ export function buildDialogues(data: PortfolioData): Record<string, Dialogue> {
     };
   }
 
+  const arenaProjectLinks: DialogueLink[] = data.projects.flatMap((p) => {
+    const links: DialogueLink[] = [];
+    const front = safeUrl(p.front_url);
+    const back = safeUrl(p.back_url);
+    const demo = safeUrl(p.demo_url);
+    if (front) links.push({ label: `GitHub · ${p.title}`, href: front });
+    if (back && back !== front) links.push({ label: `Back-end · ${p.title}`, href: back });
+    if (demo) links.push({ label: `Vercel/Demo · ${p.title}`, href: demo });
+    return links;
+  });
+
   out["projects-intro"] = {
-    speaker: "Juíza",
+    speaker: "Cynthia",
     pages: [
-      { text: t("projectsIntro") || "" },
-      { text: "Toque em cada troféu para ver o projeto e os repositórios." },
+      {
+        text: `Oi! Eu sou Cynthia. Estes troféus não são meus: eles representam os projetos do ${name} que estão sendo apresentados nesta Arena.`,
+      },
+      {
+        text:
+          "Cada troféu abre os detalhes do respectivo projeto. Os links abaixo levam diretamente aos repositórios do GitHub e, quando houver uma demo publicada, também à versão online.",
+        links: arenaProjectLinks,
+      },
+      {
+        text:
+          "No celular, toque no troféu ou em um dos links. Você também pode usar o menu de atalhos para chegar direto à Arena, Casa, Lab ou Loja.",
+      },
     ],
   };
   out["projects-all"] = {
