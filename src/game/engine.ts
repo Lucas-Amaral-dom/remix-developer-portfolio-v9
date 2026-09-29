@@ -1878,7 +1878,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
                 npc.facing = pickDir;
                 // Set the direction frame immediately, so the first walking tick
                 // cannot briefly show the previous direction.
-                npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, 0);
+                npc.spr.frame = npc.standaloneWorldSprite ? 0 : trainerFrame(npc.trainerVariant, npc.facing, 0);
                 npc.walkProgress = 0;
                 npc.walkAnimTime = 0;
                 npc.walkStep = 0;
