@@ -28,7 +28,7 @@ import overworldSerena from "@/assets/trainers/overworld/serena.png";
  * Cada variante ocupa 16 frames: 4 direções × 4 poses.
  * O índice precisa permanecer alinhado com os retratos de batalha locais.
  */
-// `characters.png` contains 32 complete trainer variants (4 directions × 4 frames).
+// `characters.png` contains 12 complete trainer variants (4 directions × 4 frames).
 // Keep all of them available so city NPCs do not recycle the first 12 sprites.
 export const TRAINER_VARIANTS = 12;
 
