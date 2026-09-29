@@ -75,7 +75,7 @@ export function DPad({ onDir, onAction, actionLabel }: Props) {
     const drag = dragRef.current;
     if (!drag || drag.pointerId !== e.pointerId) return;
     const dx = (e.clientX - drag.startX) / window.innerWidth * 100;
-    const dy = (e.clientY - drag.startY) / window.innerHeight * 100;
+    // The controls use `bottom`, so CSS Y grows upward. Pointer Y grows downward.\n    // Invert the pointer delta so dragging follows the finger naturally.\n    const dy = (drag.startY - e.clientY) / window.innerHeight * 100;
     setPositions((prev) => ({
       ...prev,
       [drag.target]: {
