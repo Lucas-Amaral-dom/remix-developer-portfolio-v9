@@ -586,45 +586,43 @@ export function buildDialogues(data: PortfolioData): Record<string, Dialogue> {
     speaker: "Pesquisadora do Oásis",
     pages: [
       { text: "Catalogando projetos e novas ideias enquanto observo o movimento da cidade." },
-      { text: "Oásis também é lugar de pesquisa, testes e aprendizado contínuo." },
+      { text: "Oásis também é lugar de pesquisa, testes e aprendizado contínuo. Meus dados estão prontos para um duelo.", battleOpponentId: "oasis-researcher", battleLabel: "⚔️ Batalhar com a Pesquisadora do Oásis!" },
     ],
   };
   out["dev-builder"] = {
     speaker: "Construtor do Workshop",
     pages: [
       { text: "Estou cuidando da estrutura da oficina para tudo ficar organizado e acessível." },
-      { text: "Boas construções e bom código começam com uma base sólida." },
+      { text: "Boas construções e bom código começam com uma base sólida. Quer testar minha bancada de construção?", battleOpponentId: "builder", battleLabel: "⚔️ Desafiar Construtor do Workshop!" },
     ],
   };
   out["city-tourist"] = {
     speaker: "Turista do Deserto",
     pages: [
-      {
-        text: "Vim conhecer a cidade e encontrei uma mistura curiosa de descanso, tecnologia e Pokémon.",
-      },
+      { text: "Vim conhecer a cidade e encontrei uma mistura curiosa de descanso, tecnologia e Pokémon. Vamos testar sua equipe?", battleOpponentId: "tourist", battleLabel: "⚔️ Batalhar com o Turista do Deserto!" },
     ],
   };
   out["city-oasis-traveler"] = {
     speaker: "Viajante do Oásis",
-    pages: [{ text: "A estrada pelo Oásis é tranquila e cheia de pontos para descansar." }],
+    pages: [{ text: "A estrada pelo Oásis é tranquila e cheia de pontos para descansar. Mas também é um ótimo lugar para treinar!", battleOpponentId: "oasis-traveler", battleLabel: "⚔️ Batalhar com o Viajante do Oásis!" }],
   };
   out["city-square-trainer"] = {
     speaker: "Treinador da Praça",
-    pages: [{ text: "Treino movimentos básicos por aqui antes de seguir para a Arena." }],
+    pages: [{ text: "Treino movimentos básicos por aqui antes de seguir para a Arena. Quer um duelo rápido?", battleOpponentId: "square-trainer", battleLabel: "⚔️ Batalhar com o Treinador da Praça!" }],
   };
   out["city-explorer"] = {
     speaker: "Exploradora do Deserto",
-    pages: [{ text: "Estou mapeando as trilhas e os cantos mais seguros das dunas." }],
+    pages: [{ text: "Estou mapeando as trilhas e os cantos mais seguros das dunas. Vamos testar a rota em batalha?", battleOpponentId: "explorer", battleLabel: "⚔️ Batalhar com a Exploradora do Deserto!" }],
   };
   out["city-artist"] = {
     speaker: "Artista do Oásis",
     pages: [
-      { text: "Estou registrando esta cidade em pixel art para não esquecer nenhum detalhe." },
+      { text: "Estou registrando esta cidade em pixel art para não esquecer nenhum detalhe. Até meus Pokémon posam para batalhas!", battleOpponentId: "artist", battleLabel: "⚔️ Batalhar com a Artista do Oásis!" },
     ],
   };
   out["city-field-researcher"] = {
     speaker: "Pesquisador de Campo",
-    pages: [{ text: "No campo é onde as ideias encontram problemas reais para resolver." }],
+    pages: [{ text: "No campo é onde as ideias encontram problemas reais para resolver. Vamos experimentar em uma batalha?", battleOpponentId: "field-researcher", battleLabel: "⚔️ Batalhar com o Pesquisador de Campo!" }],
   };
 
   out["oasis-plaza"] = {
@@ -763,9 +761,7 @@ export function buildDialogues(data: PortfolioData): Record<string, Dialogue> {
     speaker: "Mercador do Bazar",
     pages: [
       { text: "Venha conferir nossos suprimentos! Temos poções, frutas raras e contatos diretos!" },
-      {
-        text: "Precisa de um desenvolvedor dedicado e comunicativo? O Lucas está pronto para novos desafios!",
-      },
+      { text: "Precisa de um desenvolvedor dedicado e comunicativo? O Lucas está pronto para novos desafios! E meu Kecleon também.", battleOpponentId: "merchant", battleLabel: "⚔️ Batalhar com o Mercador do Bazar!" },
     ],
   };
 
