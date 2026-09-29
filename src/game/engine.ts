@@ -241,6 +241,10 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   canvas.addEventListener("pointerdown", () => canvas.focus());
   requestAnimationFrame(() => canvas.focus());
 
+  const touchLayout =
+    typeof window !== "undefined" &&
+    window.matchMedia("(max-width: 1024px) and (pointer: coarse)").matches;
+
   const k: KAPLAYCtx = kaplay({
     canvas,
     width: 960,
@@ -2176,9 +2180,6 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       // clamped to the actual map bounds.
       const halfW = k.width() / 2;
       const halfH = k.height() / 2;
-      const touchLayout =
-        typeof window !== "undefined" &&
-        window.matchMedia("(max-width: 1024px) and (pointer: coarse)").matches;
       const deadZoneX = k.width() * (touchLayout ? 0.20 : 0.15);
       const deadZoneY = k.height() * (touchLayout ? 0.18 : 0.14);
 
