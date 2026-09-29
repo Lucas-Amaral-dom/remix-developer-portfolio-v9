@@ -108,7 +108,11 @@ function TitleScreen({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (["Enter", " "].includes(e.key)) handleStart();
+      if (e.repeat) return;
+      if (["Enter", " "].includes(e.key)) {
+        e.preventDefault();
+        handleStart();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
