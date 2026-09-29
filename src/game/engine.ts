@@ -24,6 +24,7 @@ import townBluehallSprite from "@/assets/build-town-bluehall.png";
 import townPinkcottageSprite from "@/assets/build-town-pinkcottage.png";
 import townOrangecottageSprite from "@/assets/build-town-orangecottage.png";
 import trainerOverworldAtlas from "@/assets/characters.png";
+import overworldDawn from "@/assets/trainers/overworld/dawn.png";
 import doorModernSprite from "@/assets/door-modern.png";
 import doorWoodSprite from "@/assets/door-wood.png";
 import desertSandTile from "@/assets/tiles/desert-sand.png";
@@ -150,6 +151,7 @@ const SPRITES: Record<string, string> = {
   "poke-delphox": DelphoxSprite,
   "poke-greninja": GreninjaSprite,
   "poke-yveltal": YveltalSprite,
+  "nurse-joy-world": overworldDawn,
   "poke-primarina": PrimarinaSprite,
   "poke-golisopod": GolisopodSprite,
   "poke-mimikyu": MimikyuSprite,
@@ -1619,6 +1621,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     for (const item of npcInteractables) {
       const trainerVariant = npcTrainerVariant(item.npc ?? 0, item.label);
       const face = item.face ?? "down";
+      const isNurseJoy = item.label === "Enfermeira Joy";
       const px = item.x * TILE + TILE / 2;
       const py = item.y * TILE + TILE;
 
@@ -1635,13 +1638,15 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       // One visual instance only: using two overlapping sprites caused the
       // old walking/idle switch to leave a visible duplicate or halo.
       const spr = k.add([
-        k.sprite("trainer-chars", { frame: trainerFrame(trainerVariant, face, 0) }),
+        isNurseJoy
+          ? k.sprite("nurse-joy-world")
+          : k.sprite("trainer-chars", { frame: trainerFrame(trainerVariant, face, 0) }),
         k.pos(px, py),
         k.anchor("bot"),
         k.scale(1),
         k.opacity(1),
         k.z(20),
-      ]) as unknown as { frame: number; pos: { x: number; y: number }; opacity: number; z: number };
+      ]) as unknown as { frame?: number; pos: { x: number; y: number }; opacity: number; z: number };
 
       const emote = k.add([
         k.text("❤️", { size: 9 }),
@@ -1668,7 +1673,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         fromY: py,
         targetX: px,
         targetY: py,
-        canWander: true,
+        canWander: !isNurseJoy,
         spr,
         shadow,
         emote,
@@ -1810,6 +1815,10 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       // Update active NPCs with authentic Pokemon movement AI
       for (const npc of activeNpcs) {
         if (state.paused || npc.state === "talking") continue;
+
+        // Nurse Joy is stationed at the healing counter. Keep the exact Dawn
+        // overworld sprite and never replace it with a random atlas frame.
+        if (npc.item.label === "Enfermeira Joy") continue;
 
         if (npc.state === "idle") {
           // Idle sprites only change frame when direction/state changes. Rewriting
@@ -2060,7 +2069,12 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
                   } else {
                     matchedNpc.facing = diffY > 0 ? "down" : "up";
                   }
-                  matchedNpc.spr.frame = trainerFrame(matchedNpc.trainerVariant, matchedNpc.facing);
+                  if (matchedNpc.item.label !== "Enfermeira Joy") {
+                    matchedNpc.spr.frame = trainerFrame(
+                      matchedNpc.trainerVariant,
+                      matchedNpc.facing,
+                    );
+                  }
                   matchedNpc.emote.opacity = 1;
                   k.wait(0.8, () => {
                     matchedNpc.emote.opacity = 0;
