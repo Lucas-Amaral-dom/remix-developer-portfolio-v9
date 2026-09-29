@@ -86,14 +86,25 @@ export class TransitionManager {
         this.drawTransition(ctx, type, eased, origin, w, h, false);
 
         if (progress >= 1) {
-          // Midpoint reached: screen is 100% black
+          // Midpoint reached: screen is 100% black.
+          // Guard the scene swap so a render/configuration exception cannot leave
+          // the transition canvas permanently covering the game.
           phase = "pause";
           pauseStartTime = timestamp;
 
-          // Swap the scene and get new player spawn screen coords
-          opts.onMidpoint();
-          if (opts.getNewOrigin) {
-            origin = opts.getNewOrigin();
+          try {
+            opts.onMidpoint();
+            if (opts.getNewOrigin) {
+              origin = opts.getNewOrigin();
+            }
+          } catch (error) {
+            console.error("Scene transition failed:", error);
+            // Abort the visual transition instead of freezing on a black frame.
+            this.isRunning = false;
+            this.animId = null;
+            ctx.clearRect(0, 0, w, h);
+            opts.onComplete();
+            return;
           }
         }
       } else if (phase === "pause") {
