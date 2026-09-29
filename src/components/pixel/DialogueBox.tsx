@@ -3,8 +3,8 @@ import type { Dialogue } from "@/lib/portfolio-content";
 import { getOpponent } from "@/lib/battle/opponents";
 import {
   BATTLE_TRAINER_SPRITES_BY_VARIANT,
-  TRAINER_OVERWORLD_PORTRAITS_BY_VARIANT,
   TRAINER_VARIANT_BY_DIALOGUE_SPEAKER,
+  TRAINER_VARIANT_BY_OPPONENT_ID,
 } from "@/lib/trainer-assets";
 import { PixelButton } from "./PixelButton";
 
@@ -72,18 +72,24 @@ function TrainerAvatar({
   speaker: string;
   battleOpponentId?: string | undefined;
 }) {
-  const variant = SPEAKER_VARIANTS[speaker];
+  const speakerVariant = SPEAKER_VARIANTS[speaker];
   const opponent = battleOpponentId ? getOpponent(battleOpponentId) : undefined;
   const pokemonDexId = findPokemonDexId(speaker);
   const isPokemonSpeaker = Boolean(pokemonDexId);
-  const isTrainerSpeaker = variant !== undefined && !isPokemonSpeaker;
-  const battleTrainerSprite = isTrainerSpeaker
-    ? (BATTLE_TRAINER_SPRITES_BY_VARIANT[variant] ?? opponent?.trainerAvatar ?? null)
-    : (opponent?.trainerAvatar ?? null);
+  const isTrainerSpeaker = speakerVariant !== undefined && !isPokemonSpeaker;
+  const battleVariant = battleOpponentId
+    ? TRAINER_VARIANT_BY_OPPONENT_ID[battleOpponentId]
+    : speakerVariant;
+  const battleTrainerSprite =
+    isTrainerSpeaker && battleVariant !== undefined
+      ? (BATTLE_TRAINER_SPRITES_BY_VARIANT[battleVariant] ?? opponent?.trainerAvatar ?? null)
+      : (opponent?.trainerAvatar ?? null);
   const pokemonBattleSprite = pokemonDexId
     ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonDexId}.png`
     : null;
-  const hasBattlePreview = Boolean(battleTrainerSprite || pokemonBattleSprite || opponent?.sprite);
+  // O retrato do treinador aparece uma única vez, usando a arte de batalha.
+  // A caixa ao lado fica reservada ao Pokémon/companheiro.
+  const hasBattlePreview = Boolean(pokemonBattleSprite || opponent?.sprite);
   const pokemonPortrait = pokemonDexId
     ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonDexId}.png`
     : null;
@@ -111,12 +117,15 @@ function TrainerAvatar({
           aria-label={`${speaker} no mapa`}
           className="flex h-24 w-16 shrink-0 items-center justify-center overflow-hidden border-2 border-[var(--pixel-border-deep)] bg-gradient-to-b from-amber-950/40 via-amber-900/20 to-black/50 shadow-md"
         >
-          {TRAINER_OVERWORLD_PORTRAITS_BY_VARIANT[variant] ? (
+          {battleTrainerSprite ? (
             <img
-              src={TRAINER_OVERWORLD_PORTRAITS_BY_VARIANT[variant]}
-              alt={`${speaker} no mapa`}
-              className="h-[72px] w-12 object-contain"
+              src={battleTrainerSprite}
+              alt={`${speaker} em batalha`}
+              loading="eager"
+              decoding="sync"
+              className="h-20 w-14 object-contain"
               style={{ imageRendering: "pixelated" }}
+              referrerPolicy="no-referrer"
               draggable={false}
             />
           ) : null}
@@ -134,17 +143,6 @@ function TrainerAvatar({
 
       {hasBattlePreview && (
         <div className="flex min-h-24 min-w-20 flex-col items-center justify-center gap-0.5 border-2 border-[var(--pixel-border-deep)] bg-black/60 px-1.5 py-1 shadow-md">
-          {battleTrainerSprite ? (
-            <img
-              src={battleTrainerSprite}
-              alt={`${speaker} em batalha`}
-              loading="eager"
-              decoding="sync"
-              className="h-20 w-14 object-contain"
-              style={{ imageRendering: "pixelated" }}
-              referrerPolicy="no-referrer"
-            />
-          ) : null}
           {pokemonBattleSprite ? (
             <img
               src={pokemonBattleSprite}
