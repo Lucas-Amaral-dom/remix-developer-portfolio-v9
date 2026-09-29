@@ -31,14 +31,14 @@ export function DPad({ onDir, onAction, actionLabel }: Props) {
         onDir(null);
       }}
       onContextMenu={(e) => e.preventDefault()}
-      className="game-dpad-btn pixel-press bg-card/35 hover:bg-card/50 border border-white/20 text-card-foreground pixel-font flex h-14 w-14 items-center justify-center text-[13px] select-none touch-none touch-manipulation backdrop-blur-[2px]"
+      className="game-dpad-btn pixel-press flex h-14 w-14 select-none touch-none touch-manipulation items-center justify-center border border-white/10 bg-white/[0.08] text-card-foreground shadow-[0_4px_14px_rgba(0,0,0,0.18)] backdrop-blur-md hover:bg-white/[0.14] active:bg-white/[0.18] pixel-font text-[13px]"
     >
       {glyph}
     </button>
   );
 
   return (
-    <div className="game-dpad flex items-end justify-between gap-4 lg:hidden">
+    <div className="game-dpad flex items-end justify-between gap-4 lg:hidden select-none">
       <div
         className="game-dpad-pad grid gap-1"
         style={{
@@ -53,12 +53,14 @@ export function DPad({ onDir, onAction, actionLabel }: Props) {
       </div>
       <button
         type="button"
+        aria-label={actionLabel}
         onPointerDown={(e) => {
           e.preventDefault();
           e.currentTarget.setPointerCapture(e.pointerId);
           onAction();
         }}
         onPointerUp={(e) => {
+          e.preventDefault();
           if (e.currentTarget.hasPointerCapture(e.pointerId)) {
             e.currentTarget.releasePointerCapture(e.pointerId);
           }
@@ -69,7 +71,7 @@ export function DPad({ onDir, onAction, actionLabel }: Props) {
           }
         }}
         onContextMenu={(e) => e.preventDefault()}
-        className="game-dpad-action pixel-press bg-primary/70 hover:bg-primary/80 border-2 border-white/25 text-primary-foreground pixel-font flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full text-[12px] select-none touch-none touch-manipulation backdrop-blur-[2px]"
+        className="game-dpad-action pixel-press flex h-[4.5rem] w-[4.5rem] select-none touch-none touch-manipulation items-center justify-center rounded-full border border-white/15 bg-primary/30 text-primary-foreground shadow-[0_4px_18px_rgba(0,0,0,0.22)] backdrop-blur-md hover:bg-primary/40 active:bg-primary/50 pixel-font text-[12px]"
       >
         {actionLabel}
       </button>
