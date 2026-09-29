@@ -854,6 +854,13 @@ function World({
   .game-shell-footer .game-footer-action-group button,
   .game-shell-footer > div > button { min-height: 40px !important; padding: 7px 10px !important; font-size: 11px !important; }
   .mobile-quick-travel-btn { min-height: 40px !important; padding: 7px 10px !important; font-size: 11px !important; }
+  .mobile-battle-btn {
+    border-color: rgba(244, 63, 94, 0.72) !important;
+    color: rgb(253, 164, 175) !important;
+  }
+  .mobile-battle-btn:active {
+    background-color: rgba(244, 63, 94, 0.14) !important;
+  }
   .game-shell-root .game-shell-header button,
   .game-shell-root .game-shell-header summary,
   .game-shell-root .game-shell-footer button,
