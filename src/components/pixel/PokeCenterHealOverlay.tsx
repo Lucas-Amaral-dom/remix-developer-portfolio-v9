@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { sound } from "@/lib/sound";
 import { healPlayerTeam } from "@/lib/team-store";
-import battleDawn from "@/assets/trainers/battle/dawn.png";
 import type { PlayerPokemon } from "@/lib/battle/types";
 
 interface Props {
@@ -105,12 +104,29 @@ export function PokeCenterHealOverlay({
         <div className="my-5 rounded-lg bg-gradient-to-b from-slate-950 via-slate-900 to-amber-950/40 p-4 border-2 border-amber-950/80 shadow-inner flex flex-col items-center">
           {/* Nurse Joy Avatar */}
           <div className="flex items-center gap-3 mb-4">
-            <img
-              src={source === "nurse" ? battleDawn : "https://play.pokemonshowdown.com/sprites/trainers/beauty.png"}
-              alt="Nurse Joy"
-              className="w-14 h-14 object-contain filter drop-shadow animate-bounce"
-              style={{ imageRendering: "pixelated" }}
-            />
+            {source === "nurse" ? (
+              <div
+                role="img"
+                aria-label="Enfermeira Joy — Dawn"
+                className="h-14 w-14 animate-bounce drop-shadow"
+                style={{
+                  width: 56,
+                  height: 84,
+                  backgroundImage: 'url("/src/assets/characters.png")',
+                  backgroundRepeat: "no-repeat",
+                  backgroundSize: "224px 4032px",
+                  backgroundPosition: "0 -1344px",
+                  imageRendering: "pixelated",
+                }}
+              />
+            ) : (
+              <img
+                src="https://play.pokemonshowdown.com/sprites/trainers/beauty.png"
+                alt="Atendente"
+                className="h-14 w-14 object-contain"
+                style={{ imageRendering: "pixelated" }}
+              />
+            )}
             <div className="bg-black/60 px-3 py-2 rounded border border-amber-500/30 text-left">
               <p className="pixel-font text-[10px] text-amber-300">
                 {source === "nurse"
