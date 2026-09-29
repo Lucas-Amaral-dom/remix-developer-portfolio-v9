@@ -71,16 +71,51 @@ function TitleScreen({
   sub: string;
   onStart: () => void;
 }) {
+  const handleStart = useCallback(() => {
+    onStart();
+
+    // Mobile browsers require a user gesture for fullscreen/orientation changes.
+    // The Start button is that gesture, so we use it to enter the game-like mode.
+    if (typeof window === "undefined") return;
+    const isTouchMobile = window.matchMedia(
+      "(max-width: 1024px) and (pointer: coarse)",
+    ).matches;
+    if (!isTouchMobile) return;
+
+    const enterImmersive = async () => {
+      try {
+        if (!document.fullscreenElement) {
+          await document.documentElement.requestFullscreen({
+            navigationUI: "hide",
+          });
+        }
+      } catch {
+        // Fullscreen is optional; the responsive layout still works without it.
+      }
+
+      try {
+        const orientation = window.screen.orientation;
+        if (orientation?.lock) {
+          await orientation.lock("landscape");
+        }
+      } catch {
+        // iOS/Safari and some embedded browsers may not expose orientation.lock().
+      }
+    };
+
+    void enterImmersive();
+  }, [onStart]);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (["Enter", " "].includes(e.key)) onStart();
+      if (["Enter", " "].includes(e.key)) handleStart();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onStart]);
+  }, [handleStart]);
 
   return (
-    <div className="scanlines relative flex min-h-dvh flex-col items-center justify-center gap-6 overflow-y-auto px-4 py-6 text-center sm:px-6">
+    <div className="game-title-screen scanlines relative flex min-h-dvh flex-col items-center justify-center gap-6 overflow-y-auto px-4 py-6 text-center sm:px-6">
       <div className="bg-card text-card-foreground pixel-frame max-w-xl p-6 md:p-10">
         <p className="pixel-font text-primary text-[10px]">PORTFOLIO QUEST · DESERT OASIS</p>
         <h1 className="pixel-font mt-4 text-lg leading-relaxed md:text-2xl">{name}</h1>
@@ -89,8 +124,8 @@ function TitleScreen({
         </p>
         <p className="mt-4 text-sm leading-relaxed">{sub}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <PixelButton onClick={onStart} className="animate-[bob_1.6s_steps(4)_infinite]">
-            ▶ Aperte Start
+          <PixelButton onClick={handleStart} className="animate-[bob_1.6s_steps(4)_infinite]">
+            ▶ Iniciar jogo
           </PixelButton>
           <Link
             to="/admin"
@@ -400,8 +435,8 @@ function World({
   const activeTransition = TRANSITIONS.find((t) => t.id === transitionType) ?? TRANSITIONS[0]!;
 
   return (
-    <div className="relative flex h-dvh min-h-dvh flex-col overflow-hidden">
-      <header className="shrink-0 border-b-4 border-[var(--pixel-border-deep)] bg-[oklch(0.27_0.045_38)] px-2 py-2 text-amber-50 shadow-lg backdrop-blur-sm sm:px-3">
+    <div className="game-shell-root relative flex h-dvh min-h-dvh flex-col overflow-hidden">
+      <header className="game-shell-header shrink-0 border-b-4 border-[var(--pixel-border-deep)] bg-[oklch(0.27_0.045_38)] px-2 py-2 text-amber-50 shadow-lg backdrop-blur-sm sm:px-3">
         <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-2">
           <div className="flex min-w-0 items-center justify-between gap-2">
             <h1 className="pixel-font min-w-0 truncate text-[10px] text-amber-100 sm:text-[11px]">
@@ -478,7 +513,7 @@ function World({
 
           <nav
             aria-label="Navegação rápida do mapa"
-            className="scrollbar-none flex min-w-0 w-full items-center gap-1.5 overflow-x-auto pb-1 sm:justify-end sm:gap-2"
+            className="game-shell-nav scrollbar-none flex min-w-0 w-full items-center gap-1.5 overflow-x-auto pb-1 sm:justify-end sm:gap-2"
           >
             {[
               ["home", "🏠", "Casa", "Sobre mim"],
@@ -548,7 +583,7 @@ function World({
         </div>
       </header>
       <div
-        className={`relative min-h-0 flex-1 overflow-hidden bg-[#241a16] ${
+        className={`game-shell-stage relative min-h-0 flex-1 overflow-hidden bg-[#241a16] ${
           isFullscreen || isMaximized ? "w-screen h-screen" : ""
         }`}
       >
@@ -566,7 +601,7 @@ function World({
             <div className="flex max-w-[96vw] flex-wrap items-center justify-center gap-2 bg-[#1a120e]/95 px-2.5 py-2 text-amber-100 pixel-frame-sm shadow-[0_8px_24px_rgba(0,0,0,0.6)] border-2 border-amber-500/70 backdrop-blur-sm hover:border-amber-400 transition-colors sm:gap-3 sm:px-4">
               <span className="text-xl select-none filter drop-shadow">{locationToast.icon}</span>
               <div>
-                <div className="flex items-center gap-2">
+                <div className="game-footer-action-group flex items-center gap-2">
                   <span className="pixel-font text-[10px] font-bold text-amber-300 tracking-wider">
                     {locationToast.title}
                   </span>
@@ -669,15 +704,41 @@ function World({
             setScreen("arena");
           }}
         />
-      </div>
 
-      <footer className="border-border shrink-0 flex flex-wrap items-center justify-between gap-2 border-t-4 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] bg-card/90 sm:gap-3 sm:px-3 sm:py-3">
+          <div className="mobile-portrait-overlay" role="status" aria-live="polite">
+            <div className="mobile-portrait-card">
+              <div className="text-4xl" aria-hidden="true">📱↻</div>
+              <p className="pixel-font text-[11px] text-amber-100">Gire o celular</p>
+              <p className="mt-2 text-xs leading-relaxed text-zinc-300">
+                O Desert Oasis foi preparado para jogar na horizontal, com controles de toque e
+                tela cheia.
+              </p>
+              <button
+                type="button"
+                className="pixel-font mt-4 bg-primary px-4 py-2 text-[9px] uppercase text-primary-foreground pixel-press"
+                onClick={() => {
+                  void toggleFullscreen();
+                  try {
+                    const orientation = window.screen.orientation;
+                    if (orientation?.lock) void orientation.lock("landscape");
+                  } catch {
+                    // Orientation lock is best-effort across mobile browsers.
+                  }
+                }}
+              >
+                ⛶ Tentar modo jogo
+              </button>
+            </div>
+          </div>
+        </div>
+
+      <footer className="game-shell-footer border-border shrink-0 flex flex-wrap items-center justify-between gap-2 border-t-4 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] bg-card/90 sm:gap-3 sm:px-3 sm:py-3">
         <DPad
           onDir={(d: Dir | null) => gameRef.current?.setDir(d)}
           onAction={() => (dialogue ? undefined : gameRef.current?.interact())}
           actionLabel="A"
         />
-        <div className="hidden md:block text-center">
+        <div className="game-desktop-help hidden md:block text-center">
           <p className="pixel-font text-[8px] opacity-80 leading-normal">
             Setas / WASD para andar · A, Enter, Espaço para interagir
           </p>
@@ -686,7 +747,7 @@ function World({
           </p>
         </div>
         {scene?.indoor ? (
-          <div className="flex gap-2">
+          <div className="game-footer-action-group flex gap-2">
             <PixelButton onClick={() => setScreen(scene.id as Exclude<SceneId, "city">)}>
               Ver dados
             </PixelButton>
