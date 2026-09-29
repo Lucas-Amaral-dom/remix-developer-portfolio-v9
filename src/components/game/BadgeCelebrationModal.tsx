@@ -167,7 +167,7 @@ export function BadgeCelebrationModal({
         </div>
       )}
 
-      <div className="relative flex w-full max-w-2xl max-h-[92dvh] flex-col overflow-hidden bg-card text-card-foreground pixel-frame border-4 border-amber-400 shadow-2xl">
+      <div className="relative flex w-full max-w-2xl max-h-[92dvh] flex-col overflow-hidden bg-[#17110d] text-amber-50 pixel-frame border-4 border-amber-300 shadow-2xl">
         <div className="min-h-0 flex-1 overflow-y-auto p-5 md:p-8 space-y-6">
           {/* Header Ribbon */}
           <div className="text-center space-y-2">
@@ -175,13 +175,13 @@ export function BadgeCelebrationModal({
               {isComplete ? "★ CAMPEÃO DO PORTFÓLIO QUEST ★" : "ESTOJO DE INSÍGNIAS"}
             </div>
 
-            <h2 className="pixel-font mt-2 text-base text-white md:text-xl">
+            <h2 className="pixel-font mt-2 text-[13px] leading-relaxed text-white md:text-xl">
               {isComplete
                 ? "TODAS AS INSÍGNIAS CONQUISTADAS!"
                 : `PROGRESSO: ${badges.length} DE ${BADGES.length} INSÍGNIAS`}
             </h2>
 
-            <p className="mx-auto max-w-lg text-xs leading-relaxed text-slate-100 md:text-sm">
+            <p className="mx-auto max-w-lg text-sm leading-relaxed text-white md:text-base">
               {isComplete
                 ? "Parabéns, Treinador! Você explorou o Desert Oasis completo e conheceu toda a trajetória, habilidades e projetos de Lucas Amaral."
                 : "Visite cada uma das 4 construções principais da cidade para carimbar sua jornada de desenvolvedor."}
@@ -191,10 +191,10 @@ export function BadgeCelebrationModal({
                 aria-live="polite"
                 className="mx-auto w-full max-w-xl border-2 border-amber-300/80 bg-zinc-950/85 px-4 py-3 text-left shadow-inner"
               >
-                <p className="text-sm font-bold text-amber-100 md:text-base">
+                <p className="text-sm font-bold leading-relaxed text-amber-100 md:text-base">
                   Você conquistou as 4 insígnias da jornada!
                 </p>
-                <p className="mt-1 text-xs leading-relaxed text-slate-100 md:text-sm">
+                <p className="mt-1 text-sm leading-relaxed text-white md:text-base">
                   Casa · Lab · Arena · Loja — todas as áreas principais foram exploradas.
                 </p>
               </div>
@@ -248,7 +248,7 @@ export function BadgeCelebrationModal({
                     <p className="pixel-font text-[8px] text-amber-500 uppercase mt-0.5">
                       {info.domain}
                     </p>
-                    <p className="text-[11px] text-slate-200 leading-snug mt-1">{info.desc}</p>
+                    <p className="text-sm text-white leading-relaxed mt-1">{info.desc}</p>
                   </div>
                 </div>
               );
@@ -258,10 +258,10 @@ export function BadgeCelebrationModal({
           {/* Developer Contact CTA */}
           {isComplete && (
             <div className="space-y-2 border-2 border-amber-300/70 bg-zinc-950/85 p-3.5 text-center pixel-frame-sm">
-              <p className="pixel-font text-[9px] uppercase text-amber-200">
+              <p className="pixel-font text-[10px] uppercase text-amber-200">
                 Próximo Passo da Jornada
               </p>
-              <p className="text-xs leading-relaxed text-slate-100">
+              <p className="text-sm leading-relaxed text-white md:text-base">
                 Gostou do portfólio e da proposta interativa? Vamos conversar sobre estágio,
                 projetos ou oportunidades profissionais!
               </p>
