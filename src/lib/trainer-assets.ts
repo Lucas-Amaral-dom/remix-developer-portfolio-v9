@@ -45,7 +45,29 @@ export const TRAINER_VARIANT_NAMES = [
   "Calem",
   "Hilbert",
   "Hilda",
-] as const;
+] as const;/**
+ * Physical positions in characters.png, using human-friendly 1-based numbering.
+ * Position 5 is Dawn; position 6 is Lucas.
+ */
+export const TRAINER_ATLAS_POSITION_BY_NAME = {
+  Red: 1,
+  Leaf: 2,
+  Brendan: 3,
+  May: 4,
+  Dawn: 5,
+  Lucas: 6,
+  Serena: 7,
+  Ethan: 8,
+  Cynthia: 9,
+  Calem: 10,
+  Hilbert: 11,
+  Hilda: 12,
+} as const;
+
+export const TRAINER_ATLAS_VARIANT_BY_NAME = Object.fromEntries(
+  Object.entries(TRAINER_ATLAS_POSITION_BY_NAME).map(([name, position]) => [name, position - 1]),
+) as Record<keyof typeof TRAINER_ATLAS_POSITION_BY_NAME, number>;
+
 
 export const TRAINER_VARIANT_BY_ID: Record<string, number> = {
   // Variantes reais disponíveis no atlas characters.png (0–11).
