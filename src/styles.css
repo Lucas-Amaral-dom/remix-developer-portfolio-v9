@@ -384,6 +384,62 @@
   }
 }
 
+@media (max-width: 1024px) and (orientation: landscape) {
+  /* Battle UI: preserve the full 4:3 stage even on short phone viewports. */
+  .battle-shell {
+    width: min(calc(100vw - 8px), calc((100dvh - 8px) * 4 / 3));
+    height: min(calc(100dvh - 8px), calc((100vw - 8px) * 3 / 4));
+    max-width: none;
+    max-height: calc(100dvh - 8px);
+    aspect-ratio: 4 / 3;
+  }
+
+  .battle-toolbar {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .battle-toolbar > div:first-child {
+    min-width: 0;
+  }
+
+  .battle-toolbar > div:first-child > span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .battle-toolbar-actions {
+    flex-shrink: 0;
+    gap: 4px;
+  }
+
+  .battle-toolbar-actions select {
+    max-width: 92px;
+  }
+
+  .battle-toolbar-actions button {
+    min-height: 30px;
+  }
+}
+
+@media (max-width: 640px) and (orientation: landscape) {
+  .battle-toolbar-actions > button:first-child,
+  .battle-toolbar-actions > button:nth-child(2) {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .battle-toolbar-actions > button:first-child span,
+  .battle-toolbar-actions > button:nth-child(2) span {
+    display: none;
+  }
+
+  .battle-toolbar-actions select {
+    max-width: 74px;
+  }
+}
+
 @media (max-width: 1024px) and (orientation: portrait) {
   .mobile-portrait-overlay {
     position: absolute;
