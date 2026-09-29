@@ -1947,15 +1947,11 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
             [nx - half, ny - 2],
             [nx + half, ny - 2],
           ];
-          return corners.every(
-            ([cx, cy]) =>
-              !isPlayerMovementBlocked(
-                scene,
-                rows,
-                Math.floor(cx! / TILE),
-                Math.floor(cy! / TILE),
-              ),
-          );
+          return corners.every(([cx, cy]) => {
+            const col = Math.floor(cx! / TILE);
+            const row = Math.floor(cy! / TILE);
+            return !movementBlocked(col, row);
+          });
         };
 
         const prevX = player.pos.x;
