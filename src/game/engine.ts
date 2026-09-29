@@ -1738,18 +1738,18 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           p.idleTimer -= dt;
           // Gentle breathing idle
           const t = now;
-          setScaleY(p.spr, p.baseScale + Math.sin(t * 3.5 + p.curCol) * 0.02);
+          setScaleY(p.spr, p.baseScale + Math.sin(t * 3.5 + p.curCol) * 0.04);
           setScaleX(p.spr, (p.facing === "left" ? -1 : 1) * p.baseScale);
           p.spr.angle = 0;
 
           if (p.idleTimer <= 0) {
-            if (Math.random() < 0.45) {
+            if (Math.random() < 0.35) {
               // Turn direction. These Pokémon assets are static overworld poses:
               // left/right can mirror safely; up/down keep the native pose.
               const dirs: Dir[] = ["down", "left", "right", "up"];
               p.facing = dirs[Math.floor(Math.random() * dirs.length)]!;
               setScaleX(p.spr, p.facing === "left" ? -1 : 1);
-              p.idleTimer = 1.6 + Math.random() * 2.2;
+              p.idleTimer = 1.0 + Math.random() * 1.5;
             } else {
               // Take a roaming step
               const dirs: [number, number][] = [
@@ -1783,7 +1783,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
                 p.targetX = nextCol * TILE + TILE / 2;
                 p.targetY = nextRow * TILE + TILE - 2;
               } else {
-                p.idleTimer = 1.2 + Math.random() * 1.5;
+                p.idleTimer = 0.8 + Math.random() * 1.2;
               }
             }
           }
@@ -1830,11 +1830,11 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
           if (npc.idleTimer <= 0) {
             const dirs: Dir[] = ["down", "left", "right", "up"];
-            if (!npc.canWander || Math.random() < 0.4) {
+            if (!npc.canWander || Math.random() < 0.25) {
               // Turn first, then resolve the correct row in the trainer atlas.
               npc.facing = dirs[Math.floor(Math.random() * dirs.length)]!;
               npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, 0);
-              npc.idleTimer = 1.8 + Math.random() * 2.5;
+              npc.idleTimer = 0.7 + Math.random() * 1.1;
             } else {
               // Choose a step to walk
               const pickDir = dirs[Math.floor(Math.random() * dirs.length)]!;
