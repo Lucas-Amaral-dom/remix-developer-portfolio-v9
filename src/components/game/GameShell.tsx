@@ -870,8 +870,19 @@ function World({
   .game-shell-footer {
     position: relative;
     z-index: 20;
-    min-height: clamp(70px, 16dvh, 104px);
+    min-height: clamp(76px, 18dvh, 112px);
     align-items: center;
+  }
+  .game-shell-footer .game-dpad {
+    width: min(100%, 360px);
+  }
+  .game-shell-footer > .game-footer-action-group,
+  .game-shell-footer > div:last-child {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+  .game-dialogue-layer {
+    bottom: 0;
   }
   .game-dpad {
     flex: 0 0 auto;
