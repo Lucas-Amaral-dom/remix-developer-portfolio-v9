@@ -30,7 +30,7 @@ import overworldSerena from "@/assets/trainers/overworld/serena.png";
  */
 // `characters.png` contains 32 complete trainer variants (4 directions × 4 frames).
 // Keep all of them available so city NPCs do not recycle the first 12 sprites.
-export const TRAINER_VARIANTS = 32;
+export const TRAINER_VARIANTS = 12;
 
 export const TRAINER_VARIANT_NAMES = [
   "Red",
@@ -48,48 +48,52 @@ export const TRAINER_VARIANT_NAMES = [
 ] as const;
 
 export const TRAINER_VARIANT_BY_ID: Record<string, number> = {
-  // Cidade: variantes distintas para reduzir reciclagem visual.
+  // Variantes reais disponíveis no atlas characters.png (0–11).
   "Guia do Oásis": 0,
-  "Viajante do Deserto": 1,
-  "Lutador de Sparring": 2,
-  "Campista Dev": 3,
-  "Pescadora do Oásis": 4,
-  "Desenvolvedor Full Stack": 5,
-  "Mecânica de Software": 6,
-  "Construtor do Workshop": 7,
-  "Mercador de Frutas e Itens": 8,
-  "Mestre de Batalhas": 9,
-  "Pesquisadora do Oásis": 10,
-  "Ranger do Santuário": 11,
-  "Turista do Deserto": 12,
-  "Viajante do Oásis": 13,
-  "Treinador da Praça": 14,
-  "Exploradora do Deserto": 15,
-  "Artista do Oásis": 16,
-  "Pesquisador de Campo": 17,
-
-  // Interiores / NPCs de apoio podem reutilizar variantes, mas nunca alteram
-  // a identidade dos NPCs de batalha acima.
-  Lucas: 18,
-  "Lucas Amaral": 18,
-  Atendente: 19,
-  "Instrutor SENAI": 21,
-  "Hoteleira do Oásis": 5,
-  "Enfermeira Joy": 24,
-  "Arquiteto de Software": 23,
-  "Juíza da Arena": 22,
-  "Curador de Créditos": 25,
-
-  // Aliases de diálogo e de listas de batalha precisam apontar para o mesmo personagem.
-  Guia: 0,
   "Guia da Cidade": 0,
+  Guia: 0,
+  "Viajante do Deserto": 1,
+  "Viajante do Oásis": 1,
+  Atendente: 1,
+
+  "Lutador de Sparring": 2,
   "Lutador do Sparring Ring": 2,
+  "Exploradora do Deserto": 2,
+
+  "Campista Dev": 3,
+
+  "Pescadora do Oásis": 4,
+  "Artista do Oásis": 4,
+  "Enfermeira Joy": 4,
+
+  "Desenvolvedor Full Stack": 5,
   "Desenvolvedor da Oficina": 5,
-  "Pesquisador do Oásis": 10,
+  "Hoteleira do Oásis": 5,
+
+  "Mecânica de Software": 6,
+  "Ranger do Santuário": 6,
+  "Turista do Deserto": 6,
+  "Pesquisadora do Oásis": 6,
+
+  "Construtor do Workshop": 7,
+  "Pesquisador de Campo": 7,
+  "Arquiteto de Software": 7,
+
+  "Mercador de Frutas e Itens": 8,
   "Mercador do Bazar": 8,
+
+  "Mestre de Batalhas": 9,
   "Mestre da Arena": 9,
-  Hoteleira: 5,
-  "Juíza": 22,
+  "Instrutor SENAI": 9,
+
+  "Curador de Créditos": 10,
+  "Pesquisador do Oásis": 10,
+
+  "Juíza da Arena": 11,
+  Juíza: 11,
+
+  Lucas: 0,
+  "Lucas Amaral": 0,
 };
 
 export const TRAINER_OVERWORLD_PORTRAITS_BY_VARIANT: Record<number, string> = {
@@ -144,4 +148,8 @@ export const TRAINER_VARIANT_BY_OPPONENT_ID: Record<string, number> = {
   eevee: 6,
   arcanine: 9,
   flygon: 1,
+  pikachu: 0,
+  merchant: 8,
+  bulbasaur: 10,
+  chansey: 5,
 };
