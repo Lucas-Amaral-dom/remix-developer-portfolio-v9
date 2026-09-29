@@ -166,7 +166,10 @@ const SPRITES: Record<string, string> = {
  * The variant order is centralized in `@/lib/trainer-assets` so overworld and
  * dialogue sprites cannot drift apart.
  */
-const TRAINER_DIR_INDEX: Record<Dir, number> = { down: 0, left: 1, right: 2, up: 3 };
+// characters.png stores four direction rows per trainer in this order:
+// down, up, left, right. Keeping this map explicit prevents side/back poses
+// from being shown when an NPC changes direction.
+const TRAINER_DIR_INDEX: Record<Dir, number> = { down: 0, up: 1, left: 2, right: 3 };
 const TRAINER_FRAMES_PER_DIRECTION = 4;
 const WALK_ANIMATION_FPS = 10;
 
@@ -1683,7 +1686,8 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
           if (p.idleTimer <= 0) {
             if (Math.random() < 0.45) {
-              // Turn direction
+              // Turn direction. These Pokémon assets are static overworld poses:
+              // left/right can mirror safely; up/down keep the native pose.
               const dirs: Dir[] = ["down", "left", "right", "up"];
               p.facing = dirs[Math.floor(Math.random() * dirs.length)]!;
               setScaleX(p.spr, p.facing === "left" ? -1 : 1);
@@ -1712,6 +1716,9 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
               ) {
                 p.state = "walking";
                 p.facing = dx < 0 ? "left" : dx > 0 ? "right" : dy < 0 ? "up" : "down";
+                // Apply lateral flip immediately so a leftward walk never starts
+                // with the previous right-facing pose.
+                setScaleX(p.spr, (p.facing === "left" ? -1 : 1) * p.baseScale);
                 p.walkProgress = 0;
                 p.fromX = p.spr.pos.x;
                 p.fromY = p.curRow * TILE + TILE - 2;
@@ -1762,7 +1769,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           if (npc.idleTimer <= 0) {
             const dirs: Dir[] = ["down", "left", "right", "up"];
             if (!npc.canWander || Math.random() < 0.4) {
-              // Just look in a new direction
+              // Turn first, then resolve the correct row in the trainer atlas.
               npc.facing = dirs[Math.floor(Math.random() * dirs.length)]!;
               npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, 0);
               npc.idleTimer = 1.8 + Math.random() * 2.5;
@@ -1795,6 +1802,9 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
               ) {
                 npc.state = "walking";
                 npc.facing = pickDir;
+                // Set the direction frame immediately, so the first walking tick
+                // cannot briefly show the previous direction.
+                npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, 0);
                 npc.walkProgress = 0;
                 npc.walkAnimTime = 0;
                 npc.walkStep = 0;
