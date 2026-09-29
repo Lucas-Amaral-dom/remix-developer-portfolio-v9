@@ -8,6 +8,10 @@ import arcanineImg from "@/assets/pokemon/arcanine.png";
 import flygonImg from "@/assets/pokemon/flygon.png";
 import pikachuImg from "@/assets/pokemon/pikachu.png";
 import bulbasaurImg from "@/assets/pokemon/bulbasaur.png";
+import {
+  BATTLE_TRAINER_SPRITES_BY_VARIANT,
+  TRAINER_VARIANT_BY_OPPONENT_ID,
+} from "@/lib/trainer-assets";
 import type { BattleOpponent } from "./types";
 
 export const MAP_OPPONENTS: BattleOpponent[] = [
@@ -15,7 +19,7 @@ export const MAP_OPPONENTS: BattleOpponent[] = [
     id: "machop",
     name: "Machop",
     trainer: "Lutador do Sparring Ring",
-    trainerAvatar: "https://play.pokemonshowdown.com/sprites/trainers/blackbelt.png",
+    trainerAvatar: BATTLE_TRAINER_SPRITES_BY_VARIANT[TRAINER_VARIANT_BY_OPPONENT_ID["machop"]],
     level: 18,
     maxHp: 85,
     sprite: machopImg,
@@ -78,7 +82,7 @@ export const MAP_OPPONENTS: BattleOpponent[] = [
     id: "psyduck",
     name: "Psyduck",
     trainer: "Pescadora do Oásis",
-    trainerAvatar: "https://play.pokemonshowdown.com/sprites/trainers/fisherman.png",
+    trainerAvatar: BATTLE_TRAINER_SPRITES_BY_VARIANT[TRAINER_VARIANT_BY_OPPONENT_ID["psyduck"]],
     level: 20,
     maxHp: 95,
     sprite: psyduckImg,
@@ -141,7 +145,7 @@ export const MAP_OPPONENTS: BattleOpponent[] = [
     id: "trapinch",
     name: "Trapinch",
     trainer: "Ranger do Santuário",
-    trainerAvatar: "https://play.pokemonshowdown.com/sprites/trainers/hiker.png",
+    trainerAvatar: BATTLE_TRAINER_SPRITES_BY_VARIANT[TRAINER_VARIANT_BY_OPPONENT_ID["trapinch"]],
     level: 22,
     maxHp: 110,
     sprite: trapinchImg,
@@ -204,7 +208,7 @@ export const MAP_OPPONENTS: BattleOpponent[] = [
     id: "charmander",
     name: "Charmander",
     trainer: "Campista Dev",
-    trainerAvatar: "https://play.pokemonshowdown.com/sprites/trainers/camper.png",
+    trainerAvatar: BATTLE_TRAINER_SPRITES_BY_VARIANT[TRAINER_VARIANT_BY_OPPONENT_ID["charmander"]],
     level: 24,
     maxHp: 100,
     sprite: charmanderImg,
@@ -267,7 +271,7 @@ export const MAP_OPPONENTS: BattleOpponent[] = [
     id: "eevee",
     name: "Eevee",
     trainer: "Mecânica de Software",
-    trainerAvatar: "https://play.pokemonshowdown.com/sprites/trainers/lass.png",
+    trainerAvatar: BATTLE_TRAINER_SPRITES_BY_VARIANT[TRAINER_VARIANT_BY_OPPONENT_ID["eevee"]],
     level: 25,
     maxHp: 105,
     sprite: eeveeImg,
@@ -330,7 +334,7 @@ export const MAP_OPPONENTS: BattleOpponent[] = [
     id: "porygon",
     name: "Porygon",
     trainer: "Desenvolvedor da Oficina",
-    trainerAvatar: "https://play.pokemonshowdown.com/sprites/trainers/scientist.png",
+    trainerAvatar: BATTLE_TRAINER_SPRITES_BY_VARIANT[TRAINER_VARIANT_BY_OPPONENT_ID["porygon"]],
     level: 26,
     maxHp: 115,
     sprite: porygonImg,
@@ -393,7 +397,7 @@ export const MAP_OPPONENTS: BattleOpponent[] = [
     id: "arcanine",
     name: "Arcanine",
     trainer: "Mestre da Arena",
-    trainerAvatar: "https://play.pokemonshowdown.com/sprites/trainers/veteran.png",
+    trainerAvatar: BATTLE_TRAINER_SPRITES_BY_VARIANT[TRAINER_VARIANT_BY_OPPONENT_ID["arcanine"]],
     level: 28,
     maxHp: 140,
     sprite: arcanineImg,
@@ -456,7 +460,7 @@ export const MAP_OPPONENTS: BattleOpponent[] = [
     id: "flygon",
     name: "Flygon Lendário",
     trainer: "Viajante do Deserto",
-    trainerAvatar: "https://play.pokemonshowdown.com/sprites/trainers/brendan.png",
+    trainerAvatar: BATTLE_TRAINER_SPRITES_BY_VARIANT[TRAINER_VARIANT_BY_OPPONENT_ID["flygon"]],
     level: 32,
     maxHp: 165,
     sprite: flygonImg,
