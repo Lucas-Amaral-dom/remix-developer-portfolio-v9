@@ -1651,6 +1651,9 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     const activeNpcs: ActiveNpc[] = [];
     for (const item of npcInteractables) {
       const trainerVariant = npcTrainerVariant(item.npc ?? 0, item.label);
+      // Cynthia uses her dedicated standalone overworld artwork in the Arena.
+      const standaloneWorldSprite =
+        item.label === "Juíza da Arena" || item.label === "Juíza" || item.label === "Cynthia";
       const face = item.face ?? "down";
       const isNurseJoy = item.label === "Enfermeira Joy";
       const px = item.x * TILE + TILE / 2;
