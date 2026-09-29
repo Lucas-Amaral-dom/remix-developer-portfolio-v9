@@ -463,7 +463,7 @@ export function buildDialogues(data: PortfolioData): Record<string, Dialogue> {
   };
 
   out["skills-intro"] = {
-    speaker: name,
+    speaker: "Instrutor SENAI",
     pages: [
       {
         text: `Sou ${name}. Aqui eu reúno as tecnologias que realmente aparecem nos meus estudos e projetos, em vez de só listar nomes.`,
