@@ -1776,6 +1776,19 @@ export function PokemonBattle({
           }
         }
       `}</style>
+      <style>{`
+@media (max-width: 1024px) and (pointer: coarse) {
+  .battle-shell button {
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  .battle-shell button:hover:not(:disabled),
+  .battle-shell button:active:not(:disabled) {
+    background-color: rgba(255,255,255,0.08) !important;
+  }
+}`}</style>
     </div>
   );
 }
