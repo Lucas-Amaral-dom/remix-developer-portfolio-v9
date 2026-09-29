@@ -1252,13 +1252,17 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     });
   }
 
-  function isMovementBlocked(scene: SceneDef, rows: string[], col: number, row: number) {
-    return isSolid(rows, col, row) || (!scene.indoor && isBuildingVisualFootprint(scene, col, row));
+  function isPlayerMovementBlocked(scene: SceneDef, rows: string[], col: number, row: number) {
+    // The protagonist has free-roam priority: decorative building overhangs are
+    // visual assets, not invisible walls. This prevents the player from getting
+    // snagged on roof/eave pixels while crossing the desert paths.
+    return isSolid(rows, col, row);
   }
 
   function isRoamingBlocked(scene: SceneDef, rows: string[], col: number, row: number) {
-    // Autonomous NPCs and Pokémon never enter the visual footprint of buildings.
-    return isMovementBlocked(scene, rows, col, row);
+    // Autonomous NPCs and Pokémon keep the stricter collision footprint so they
+    // do not wander through buildings or disappear behind architectural sprites.
+    return isSolid(rows, col, row) || (!scene.indoor && isBuildingVisualFootprint(scene, col, row));
   }
 
   // Active player reference for coordinate tracking
@@ -1339,7 +1343,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     const blockedCells = new Uint8Array(mapW * mapH);
     for (let row = 0; row < mapH; row++) {
       for (let col = 0; col < mapW; col++) {
-        blockedCells[row * mapW + col] = isMovementBlocked(scene, rows, col, row) ? 1 : 0;
+        blockedCells[row * mapW + col] = isPlayerMovementBlocked(scene, rows, col, row) ? 1 : 0;
       }
     }
 
