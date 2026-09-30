@@ -185,6 +185,13 @@ const trainerFrame = (variant: number, dir: Dir, walkFrame = 0) =>
     TRAINER_FRAMES_PER_DIRECTION +
   (Math.abs(walkFrame) % TRAINER_FRAMES_PER_DIRECTION);
 
+// Vercel can briefly serve an older cached atlas with fewer frames than the
+// current source asset. Never assign a frame before checking the loaded sprite.
+const applySafeTrainerFrame = (spr: { frame: number; numFrames?: () => number }, requested: number) => {
+  const total = typeof spr.numFrames === "function" ? spr.numFrames() : 1;
+  spr.frame = Math.max(0, Math.min(requested, Math.max(0, total - 1)));
+};
+
 const npcTrainerVariant = (id: number, npcId?: string) =>
   npcId && TRAINER_VARIANT_BY_ID[npcId] !== undefined
     ? TRAINER_VARIANT_BY_ID[npcId]
@@ -1344,7 +1351,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
   function makePlayer(pos: { x: number; y: number }, initialFacing: Dir = "down") {
     const p = k.add([
-      k.sprite("trainer-chars", { frame: trainerFrame(PLAYER_TRAINER_VARIANT, initialFacing, 0) }),
+      k.sprite("trainer-chars", { frame: 0 }),
       k.pos(pos.x * TILE + TILE / 2, pos.y * TILE + TILE),
       k.anchor("bot"),
       k.scale(1.0),
@@ -1352,6 +1359,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       { facing: initialFacing, step: 0, walkAnimTime: 0 },
       "player",
     ]);
+    applySafeTrainerFrame(p, trainerFrame(PLAYER_TRAINER_VARIANT, initialFacing, 0));
     return p;
   }
 
@@ -1739,14 +1747,19 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       const spr = k.add([
         k.sprite(standaloneWorldSprite ? "trainer-cynthia-world" : "trainer-chars", {
           // Nurse Joy is the Dawn block from characters.png: position 6 (index 5).
-          frame: standaloneWorldSprite ? 0 : trainerFrame(isNurseJoy ? 5 : trainerVariant, isNurseJoy ? "down" : face, 0),
+          // Start at frame 0; the actual frame is clamped against the loaded atlas below.
+          frame: 0,
         }),
         k.pos(px, py),
         k.anchor("bot"),
         k.scale(1),
         k.opacity(1),
         k.z(20),
-      ]) as unknown as { frame?: number; pos: { x: number; y: number }; opacity: number; z: number };
+      ]) as unknown as { frame: number; numFrames?: () => number; pos: { x: number; y: number }; opacity: number; z: number };
+
+      if (!standaloneWorldSprite) {
+        applySafeTrainerFrame(spr, trainerFrame(isNurseJoy ? 5 : trainerVariant, isNurseJoy ? "down" : face, 0));
+      }
 
       const emote = k.add([
         k.text("❤️", { size: 9 }),
@@ -1964,7 +1977,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
             if (!npc.canWander || Math.random() < 0.25) {
               // Turn first, then resolve the correct row in the trainer atlas.
               npc.facing = dirs[Math.floor(Math.random() * dirs.length)]!;
-              npc.spr.frame = npc.standaloneWorldSprite ? 0 : trainerFrame(npc.trainerVariant, npc.facing, 0);
+              applySafeTrainerFrame(npc.spr, npc.standaloneWorldSprite ? 0 : trainerFrame(npc.trainerVariant, npc.facing, 0));
               npc.idleTimer = 0.7 + Math.random() * 1.1;
             } else {
               // Choose a step to walk
@@ -1994,7 +2007,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
                 npc.facing = pickDir;
                 // Set the direction frame immediately, so the first walking tick
                 // cannot briefly show the previous direction.
-                npc.spr.frame = npc.standaloneWorldSprite ? 0 : trainerFrame(npc.trainerVariant, npc.facing, 0);
+                applySafeTrainerFrame(npc.spr, npc.standaloneWorldSprite ? 0 : trainerFrame(npc.trainerVariant, npc.facing, 0));
                 npc.walkProgress = 0;
                 npc.walkAnimTime = 0;
                 npc.walkStep = 0;
@@ -2015,7 +2028,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           // Use a fixed animation clock so every direction, especially up/down,
           // begins stepping on the first rendered frames of the movement.
           const walkFrame = Math.floor(npc.walkAnimTime * WALK_ANIMATION_FPS) % 4;
-          npc.spr.frame = npc.standaloneWorldSprite ? 0 : trainerFrame(npc.trainerVariant, npc.facing, walkFrame);
+          applySafeTrainerFrame(npc.spr, npc.standaloneWorldSprite ? 0 : trainerFrame(npc.trainerVariant, npc.facing, walkFrame));
           npc.spr.opacity = 1;
           const stepPhase = walkFrame;
 
@@ -2037,7 +2050,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
             npc.item.y = npc.curRow;
             npc.state = "idle";
             npc.walkAnimTime = 0;
-            npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, 0);
+            applySafeTrainerFrame(npc.spr, trainerFrame(npc.trainerVariant, npc.facing, 0));
             npc.spr.opacity = 1;
             setPosY(npc.spr, curPy);
             npc.idleTimer = 1.8 + Math.random() * 2.5;
@@ -2112,16 +2125,16 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           player.walkAnimTime += k.dt();
           const walkFrame = Math.floor(player.walkAnimTime * WALK_ANIMATION_FPS) % 4;
           player.step = walkFrame;
-          player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, walkFrame);
+          applySafeTrainerFrame(player, trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, walkFrame));
         } else {
           player.walkAnimTime = 0;
           player.step = 0;
-          player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, 0);
+          applySafeTrainerFrame(player, trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, 0));
         }
       } else {
         player.walkAnimTime = 0;
         player.step = 0;
-        player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, 0);
+        applySafeTrainerFrame(player, trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, 0));
       }
 
       // Check nearest interaction or door
@@ -2197,9 +2210,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
                     matchedNpc.facing = diffY > 0 ? "down" : "up";
                   }
                   if (matchedNpc.item.label !== "Enfermeira Joy") {
-                    matchedNpc.spr.frame = matchedNpc.standaloneWorldSprite
-                      ? 0
-                      : trainerFrame(matchedNpc.trainerVariant, matchedNpc.facing);
+                    applySafeTrainerFrame(matchedNpc.spr, matchedNpc.standaloneWorldSprite ? 0 : trainerFrame(matchedNpc.trainerVariant, matchedNpc.facing));
                   }
                   matchedNpc.emote.opacity = 1;
                   k.wait(0.8, () => {
@@ -2307,7 +2318,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         doorObj.apply(1);
         if (activePlayer) {
           activePlayer.facing = "up";
-          activePlayer.frame = trainerFrame(PLAYER_TRAINER_VARIANT, "up", 0);
+          applySafeTrainerFrame(activePlayer, trainerFrame(PLAYER_TRAINER_VARIANT, "up", 0));
           setPosX(activePlayer, doorObj.x * TILE + TILE / 2);
           setPosY(activePlayer, doorObj.y * TILE + 2);
         }
@@ -2420,7 +2431,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         for (const npc of currentActiveNpcs) {
           if (npc.state === "talking") {
             npc.state = "idle";
-            npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, 0);
+            applySafeTrainerFrame(npc.spr, trainerFrame(npc.trainerVariant, npc.facing, 0));
             npc.spr.opacity = 1;
             npc.walkAnimTime = 0;
             npc.idleTimer = 2.0 + Math.random() * 2.0;
