@@ -108,11 +108,7 @@ function TitleScreen({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.repeat) return;
-      if (["Enter", " "].includes(e.key)) {
-        e.preventDefault();
-        handleStart();
-      }
+      if (["Enter", " "].includes(e.key)) handleStart();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -251,29 +247,14 @@ function World({
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
-  const [isPortraitMobile, setIsPortraitMobile] = useState(false);
 
-  useEffect(() => {
-    const media = window.matchMedia("(max-width: 1024px) and (orientation: portrait)");
-    const update = () => setIsPortraitMobile(media.matches);
-    update();
-    media.addEventListener?.("change", update);
-    window.addEventListener("orientationchange", update);
-    window.addEventListener("resize", update);
-    return () => {
-      media.removeEventListener?.("change", update);
-      window.removeEventListener("orientationchange", update);
-      window.removeEventListener("resize", update);
-    };
-  }, []);
-
-  // Auto-dismiss location toast quickly so rotation/navigation is not obscured.
+  // Auto-dismiss location toast banner after 2.4 seconds
   useEffect(() => {
     if (locationToast) {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
       toastTimerRef.current = setTimeout(() => {
         setLocationToast(null);
-      }, 1200);
+      }, 2400);
     }
     return () => {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -396,7 +377,7 @@ function World({
           if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
           toastTimerRef.current = setTimeout(() => {
             setLocationToast(null);
-          }, 1200);
+          }, 2400);
         }
       },
     });
@@ -452,17 +433,10 @@ function World({
   const dialogue = dialogueId ? dialogues[dialogueId] : undefined;
 
   const activeTransition = TRANSITIONS.find((t) => t.id === transitionType) ?? TRANSITIONS[0]!;
-  const battleActive = battleOpponent !== null || battleTransitionTarget !== null;
 
   return (
-    <div
-      className="game-shell-root relative flex h-dvh min-h-dvh flex-col overflow-hidden"
-      onContextMenu={(e) => {
-        const target = e.target as HTMLElement;
-        if (target.closest("button,a,[role='button']")) e.preventDefault();
-      }}
-    >
-      {!battleActive ? <header className="game-shell-header shrink-0 border-b-4 border-[var(--pixel-border-deep)] bg-[oklch(0.27_0.045_38)] px-2 py-2 text-amber-50 shadow-lg backdrop-blur-sm sm:px-3">
+    <div className="game-shell-root relative flex h-dvh min-h-dvh flex-col overflow-hidden">
+      <header className="game-shell-header shrink-0 border-b-4 border-[var(--pixel-border-deep)] bg-[oklch(0.27_0.045_38)] px-2 py-2 text-amber-50 shadow-lg backdrop-blur-sm sm:px-3">
         <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-2">
           <div className="flex min-w-0 items-center justify-between gap-2">
             <h1 className="pixel-font min-w-0 truncate text-[10px] text-amber-100 sm:text-[11px]">
@@ -552,7 +526,7 @@ function World({
                 key={target}
                 type="button"
                 onClick={() => quickTravel(target as Exclude<SceneId, "city">)}
-                className={`pixel-frame-sm flex min-h-9 shrink-0 items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-semibold text-amber-50 whitespace-nowrap transition-all hover:bg-amber-200/10 active:scale-95 ${
+                className={`pixel-frame-sm flex min-h-9 shrink-0 items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-semibold text-amber-50 whitespace-nowrap transition-all hover:bg-amber-200/10 active:scale-95 ${
                   scene?.id === target
                     ? "bg-primary/15 text-primary border-primary/60"
                     : "text-foreground"
@@ -607,7 +581,7 @@ function World({
             </div>
           </nav>
         </div>
-      </header> : null}
+      </header>
       <div
         className={`game-shell-stage relative min-h-0 flex-1 overflow-hidden bg-[#241a16] ${
           isFullscreen || isMaximized ? "w-screen h-screen" : ""
@@ -618,24 +592,24 @@ function World({
         </div>
 
         {/* Pokemon GBA Location Toast Banner (auto-hides in ~2s or on click) */}
-        {locationToast && !screen && !isPortraitMobile && (
+        {locationToast && !screen && (
           <div
             onClick={() => setLocationToast(null)}
-            className="cursor-pointer absolute inset-x-0 top-1 z-30 flex justify-center px-1.5 transition-opacity duration-100 animate-in fade-in slide-in-from-top-3 sm:top-4"
+            className="cursor-pointer absolute inset-x-0 top-2 z-30 flex justify-center px-2 transition-all duration-300 animate-in fade-in slide-in-from-top-3 sm:top-4"
             title="Clique para fechar aviso"
           >
-            <div className="flex max-w-[94vw] flex-wrap items-center justify-center gap-1.5 bg-[#1a120e]/90 px-2 py-1.5 text-amber-100 pixel-frame-sm shadow-[0_8px_24px_rgba(0,0,0,0.6)] border-2 border-amber-500/70 backdrop-blur-sm hover:border-amber-400 transition-colors sm:gap-3 sm:px-4">
+            <div className="flex max-w-[96vw] flex-wrap items-center justify-center gap-2 bg-[#1a120e]/95 px-2.5 py-2 text-amber-100 pixel-frame-sm shadow-[0_8px_24px_rgba(0,0,0,0.6)] border-2 border-amber-500/70 backdrop-blur-sm hover:border-amber-400 transition-colors sm:gap-3 sm:px-4">
               <span className="text-xl select-none filter drop-shadow">{locationToast.icon}</span>
               <div>
                 <div className="game-footer-action-group flex items-center gap-2">
-                  <span className="pixel-font text-[8px] font-bold text-amber-300 tracking-wider">
+                  <span className="pixel-font text-[10px] font-bold text-amber-300 tracking-wider">
                     {locationToast.title}
                   </span>
                   <span className="pixel-font text-[7px] px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-200 border border-amber-400/40 font-bold">
                     {locationToast.badge}
                   </span>
                 </div>
-                <p className="pixel-font text-[7px] text-zinc-300 mt-0.5">
+                <p className="pixel-font text-[8px] text-zinc-300 mt-0.5">
                   {locationToast.subtitle}
                 </p>
               </div>
@@ -645,7 +619,7 @@ function World({
         )}
 
         {/* Action prompt text at top of screen (auto-dismisses after 3 seconds) */}
-        {prompt && promptVisible && !dialogue && !isPortraitMobile && (
+        {prompt && promptVisible && !dialogue && (
           <div
             onClick={() => setPromptVisible(false)}
             className="cursor-pointer absolute inset-x-0 top-2 z-30 flex justify-center px-2 animate-in fade-in slide-in-from-top-2 sm:top-3"
@@ -660,16 +634,15 @@ function World({
         )}
 
         {!prompt && !dialogue && scene && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center px-2">
-            <span className="pixel-font bg-card/90 text-card-foreground px-2 py-1 text-center text-[7px] leading-relaxed shadow-md border border-border">
+          <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center px-4">
+            <span className="pixel-font bg-card/90 text-card-foreground px-3 py-1.5 text-center text-[8px] leading-relaxed shadow-md border border-border">
               {scene.hint}
             </span>
           </div>
         )}
 
         {dialogue && !screen && !battleOpponent && !battleTransitionTarget && (
-          <div className="game-dialogue-layer">
-            <DialogueBox
+          <DialogueBox
             dialogue={dialogue}
             onClose={() => setDialogueId(null)}
             onStartBattle={(oppId, openTeamBuilder = false) => {
@@ -683,8 +656,7 @@ function World({
               setHealingOverlay({ isOpen: true, source });
             }}
             formSlot={<ContactForm />}
-            />
-          </div>
+          />
         )}
 
         {screen && <SceneScreen scene={screen} data={data} onClose={() => setScreen(null)} />}
@@ -738,7 +710,7 @@ function World({
           }}
         />
 
-          {!battleActive && !dialogue && !screen && !celebrationOpen && !healingOverlay.isOpen && <div className="mobile-quick-travel" aria-label="Atalhos rápidos para celular">
+          <div className="mobile-quick-travel" aria-label="Teleporte rápido para construções">
             {[
               ["home", "🏠", "Casa"],
               ["lab", "🧪", "Lab"],
@@ -756,49 +728,36 @@ function World({
                 <span>{label}</span>
               </button>
             ))}
-            <button
-              type="button"
-              onClick={() => setBattleOpponent("machop")}
-              className="mobile-quick-travel-btn mobile-battle-btn pixel-press"
-              aria-label="Iniciar batalha"
-              title="Iniciar batalha"
-            >
-              <span aria-hidden="true">⚔️</span>
-              <span>Batalha</span>
-            </button>
-          </div>}
+          </div>
 
-          {isPortraitMobile && !dialogue && !screen && !battleActive && (
-            <div className="mobile-portrait-overlay" aria-live="polite">
-              <div className="mobile-portrait-card">
-                <div className="text-2xl" aria-hidden="true">📱↻</div>
-                <div className="min-w-0">
-                  <p className="pixel-font text-[10px] text-amber-100">Modo retrato</p>
-                  <p className="mt-1 text-[10px] leading-relaxed text-zinc-300">
-                    Funciona neste formato. Para uma experiência maior, gire para horizontal.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="pixel-font shrink-0 bg-primary px-3 py-2 text-[9px] uppercase text-primary-foreground pixel-press"
-                  onClick={() => {
-                    void toggleFullscreen();
-                    try {
-                      const orientation = window.screen.orientation;
-                      if (orientation?.lock) void orientation.lock("landscape");
-                    } catch {
-                      // Orientation lock is best-effort across mobile browsers.
-                    }
-                  }}
-                >
-                  ⛶ Expandir
-                </button>
-              </div>
+          <div className="mobile-portrait-overlay" role="status" aria-live="polite">
+            <div className="mobile-portrait-card">
+              <div className="text-4xl" aria-hidden="true">📱↻</div>
+              <p className="pixel-font text-[11px] text-amber-100">Gire o celular</p>
+              <p className="mt-2 text-xs leading-relaxed text-zinc-300">
+                O Desert Oasis foi preparado para jogar na horizontal, com controles de toque e
+                tela cheia.
+              </p>
+              <button
+                type="button"
+                className="pixel-font mt-4 bg-primary px-4 py-2 text-[9px] uppercase text-primary-foreground pixel-press"
+                onClick={() => {
+                  void toggleFullscreen();
+                  try {
+                    const orientation = window.screen.orientation;
+                    if (orientation?.lock) void orientation.lock("landscape");
+                  } catch {
+                    // Orientation lock is best-effort across mobile browsers.
+                  }
+                }}
+              >
+                ⛶ Tentar modo jogo
+              </button>
             </div>
-          )}
+          </div>
         </div>
 
-      {!battleActive ? <footer className={`game-shell-footer border-border shrink-0 flex flex-wrap items-center justify-between gap-2 border-t-4 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] bg-card/90 sm:gap-3 sm:px-3 sm:py-3 ${isFullscreen || isMaximized ? "game-shell-footer-expanded" : ""}`}>
+      <footer className="game-shell-footer border-border shrink-0 flex flex-wrap items-center justify-between gap-2 border-t-4 px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] bg-card/90 sm:gap-3 sm:px-3 sm:py-3">
         <DPad
           onDir={(d: Dir | null) => gameRef.current?.setDir(d)}
           onAction={() => (dialogue ? undefined : gameRef.current?.interact())}
@@ -814,17 +773,10 @@ function World({
         </div>
         {scene?.indoor ? (
           <div className="game-footer-action-group flex gap-2">
-            <PixelButton
-              className="select-none touch-manipulation"
-              onClick={() => setScreen(scene.id as Exclude<SceneId, "city">)}
-            >
+            <PixelButton onClick={() => setScreen(scene.id as Exclude<SceneId, "city">)}>
               Ver dados
             </PixelButton>
-            <PixelButton
-              variant="secondary"
-              className="select-none touch-manipulation"
-              onClick={() => gameRef.current?.goTo("city")}
-            >
+            <PixelButton variant="secondary" onClick={() => gameRef.current?.goTo("city")}>
               ← Sair pra Cidade
             </PixelButton>
           </div>
@@ -845,154 +797,7 @@ function World({
             </Link>
           </div>
         )}
-      </footer> : null}
-      <style>{`
-@media (max-width: 900px) and (pointer: coarse) {
-  .game-shell-header { padding: 6px 8px !important; }
-  .game-shell-header h1 { font-size: 12px !important; }
-  .game-shell-nav { gap: 6px !important; }
-  .game-shell-nav > button,
-  .game-shell-nav > div > button { min-height: 40px !important; padding: 7px 10px !important; font-size: 12px !important; }
-  .game-shell-footer { min-height: 76px; padding-top: 7px !important; padding-bottom: calc(7px + env(safe-area-inset-bottom)) !important; }
-  .game-shell-footer .game-footer-action-group { gap: 6px !important; }
-  .game-shell-footer .game-footer-action-group button,
-  .game-shell-footer > div > button { min-height: 40px !important; padding: 7px 10px !important; font-size: 11px !important; }
-  .mobile-quick-travel-btn { min-height: 40px !important; padding: 7px 10px !important; font-size: 11px !important; }
-  .mobile-battle-btn {
-    border-color: rgba(244, 63, 94, 0.72) !important;
-    color: rgb(253, 164, 175) !important;
-  }
-  .mobile-battle-btn:active {
-    background-color: rgba(244, 63, 94, 0.14) !important;
-  }
-  .game-shell-root .game-shell-header button,
-  .game-shell-root .game-shell-header summary,
-  .game-shell-root .game-shell-footer button,
-  .game-shell-root .mobile-quick-travel-btn,
-  .game-shell-root .mobile-portrait-card button {
-    background-color: transparent !important;
-    background-image: none !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-  }
-  .game-shell-root .game-shell-header button:hover,
-  .game-shell-root .game-shell-footer button:hover,
-  .game-shell-root .mobile-quick-travel-btn:hover {
-    background-color: rgba(255,255,255,0.07) !important;
-  }
-}
-
-
-/* Fullscreen/expanded mode: keep controls translucent but clearly readable. */
-@media (min-width: 1025px), (max-width: 1024px) and (orientation: landscape) {
-  .game-shell-root .game-shell-header button,
-  .game-shell-root .game-shell-header summary,
-  .game-shell-root .game-shell-footer button,
-  .game-shell-root .mobile-quick-travel-btn {
-    background-color: rgba(20, 14, 12, 0.58) !important;
-    background-image: none !important;
-    border-color: rgba(251, 191, 36, 0.52) !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.32) !important;
-    backdrop-filter: blur(2px);
-  }
-  .game-shell-root .game-shell-footer button:hover,
-  .game-shell-root .game-shell-header button:hover,
-  .game-shell-root .game-shell-header summary:hover,
-  .game-shell-root .mobile-quick-travel-btn:hover {
-    background-color: rgba(35, 24, 20, 0.72) !important;
-    border-color: rgba(251, 191, 36, 0.75) !important;
-  }
-}
-@media (max-width: 1024px) and (pointer: coarse) {
-  .game-shell-stage {
-    min-height: 0;
-    height: 100%;
-    isolation: isolate;
-  }
-  .game-shell-footer {
-    position: relative;
-    z-index: 20;
-    min-height: clamp(76px, 18dvh, 112px);
-    align-items: center;
-  }
-  .game-shell-footer .game-dpad {
-    width: min(100%, 360px);
-  }
-  .game-shell-footer > .game-footer-action-group,
-  .game-shell-footer > div:last-child {
-    flex: 0 1 auto;
-    min-width: 0;
-  }
-  .game-dialogue-layer {
-    bottom: 0;
-  }
-  .game-dpad {
-    flex: 0 0 auto;
-    width: min(100%, 360px);
-    gap: clamp(10px, 3vw, 24px);
-  }
-  .game-dpad-btn {
-    width: clamp(44px, 9vw, 56px) !important;
-    height: clamp(44px, 9vw, 56px) !important;
-  }
-  .game-dpad-action {
-    width: clamp(52px, 11vw, 68px) !important;
-    height: clamp(52px, 11vw, 68px) !important;
-  }
-  .game-dialogue-layer {
-    position: absolute;
-    inset: 0;
-    z-index: 80;
-    pointer-events: none;
-  }
-  .game-dialogue-layer > * {
-    pointer-events: auto;
-  }
-  .game-dialogue-layer .dialogue-box {
-    bottom: max(8px, env(safe-area-inset-bottom)) !important;
-  }
-  .mobile-portrait-overlay {
-    pointer-events: none !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
-    padding: 8px !important;
-    background: transparent !important;
-    z-index: 25 !important;
-  }
-  .mobile-portrait-card {
-    pointer-events: auto;
-    width: min(96vw, 520px) !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    padding: 8px 10px !important;
-  }
-  .mobile-portrait-card button {
-    min-height: 38px !important;
-  }
-}
-@media (min-width: 1025px) {
-  .game-shell-footer-expanded {
-    position: fixed !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    z-index: 100 !important;
-    margin: 0 !important;
-    padding-bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
-  }
-  .game-dialogue-layer {
-    position: absolute;
-    inset: 0;
-    z-index: 80;
-    pointer-events: none;
-  }
-  .game-dialogue-layer > * {
-    pointer-events: auto;
-  }
-}
-`}</style>
+      </footer>
     </div>
   );
 }

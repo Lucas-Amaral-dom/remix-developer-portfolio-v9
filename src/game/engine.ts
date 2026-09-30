@@ -24,7 +24,6 @@ import townBluehallSprite from "@/assets/build-town-bluehall.png";
 import townPinkcottageSprite from "@/assets/build-town-pinkcottage.png";
 import townOrangecottageSprite from "@/assets/build-town-orangecottage.png";
 import trainerOverworldAtlas from "@/assets/characters.png";
-import overworldCynthia from "@/assets/trainers/overworld/cynthia.png";
 import doorModernSprite from "@/assets/door-modern.png";
 import doorWoodSprite from "@/assets/door-wood.png";
 import desertSandTile from "@/assets/tiles/desert-sand.png";
@@ -185,13 +184,6 @@ const trainerFrame = (variant: number, dir: Dir, walkFrame = 0) =>
     TRAINER_FRAMES_PER_DIRECTION +
   (Math.abs(walkFrame) % TRAINER_FRAMES_PER_DIRECTION);
 
-// Vercel can briefly serve an older cached atlas with fewer frames than the
-// current source asset. Never assign a frame before checking the loaded sprite.
-const applySafeTrainerFrame = (spr: { frame: number; numFrames?: () => number }, requested: number) => {
-  const total = typeof spr.numFrames === "function" ? spr.numFrames() : 1;
-  spr.frame = Math.max(0, Math.min(requested, Math.max(0, total - 1)));
-};
-
 const npcTrainerVariant = (id: number, npcId?: string) =>
   npcId && TRAINER_VARIANT_BY_ID[npcId] !== undefined
     ? TRAINER_VARIANT_BY_ID[npcId]
@@ -239,79 +231,14 @@ const PALETTE: Record<string, [number, number, number]> = {
 export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   // Own the canvas so it always fills the React container instead of the window.
   const canvas = document.createElement("canvas");
-  canvas.style.position = "absolute";
-  canvas.style.inset = "0";
   canvas.style.width = "100%";
   canvas.style.height = "100%";
   canvas.style.display = "block";
   canvas.style.outline = "none";
-  canvas.style.background = "rgb(36, 26, 22)";
-  canvas.style.touchAction = "none";
-  canvas.style.userSelect = "none";
-  canvas.style.webkitUserSelect = "none";
   canvas.tabIndex = 0;
   root.appendChild(canvas);
-
-  // Mobile browsers can resize the visual viewport while the user is walking
-  // (address bar, orientation, fullscreen, keyboard/gesture UI). KAPLAY listens
-  // to window resize, so explicitly forward container changes to it as well.
-  let resizeFrame = 0;
-  let viewportSyncTimer: ReturnType<typeof setTimeout> | null = null;
-  let forwardingResize = false;
-
-  const syncViewport = () => {
-    cancelAnimationFrame(resizeFrame);
-    resizeFrame = requestAnimationFrame(() => {
-      resizeFrame = 0;
-      if (root.clientWidth <= 1 || root.clientHeight <= 1) return;
-      // KAPLAY listens to window resize. Forward container/fullscreen changes
-      // exactly once, while ignoring the synthetic resize in this same handler
-      // so ResizeObserver cannot create a recursive resize loop.
-      if (forwardingResize) return;
-      forwardingResize = true;
-      try {
-        window.dispatchEvent(new Event("resize"));
-      } finally {
-        forwardingResize = false;
-      }
-    });
-  };
-
-  const scheduleViewportSync = () => {
-    if (viewportSyncTimer) clearTimeout(viewportSyncTimer);
-    syncViewport();
-    viewportSyncTimer = setTimeout(() => {
-      viewportSyncTimer = null;
-      syncViewport();
-    }, 80);
-  };
-
-  const handleWindowResize = () => {
-    if (forwardingResize) return;
-    scheduleViewportSync();
-  };
-
-  const resizeObserver =
-    typeof ResizeObserver !== "undefined"
-      ? new ResizeObserver(() => scheduleViewportSync())
-      : null;
-  resizeObserver?.observe(root);
-
-  window.addEventListener("resize", handleWindowResize);
-  window.addEventListener("orientationchange", scheduleViewportSync);
-  window.addEventListener("fullscreenchange", scheduleViewportSync);
-  window.addEventListener("pageshow", scheduleViewportSync);
-  document.addEventListener("visibilitychange", scheduleViewportSync);
-
-  canvas.addEventListener("pointerdown", () => canvas.focus(), { passive: true });
-  requestAnimationFrame(() => {
-    canvas.focus();
-    scheduleViewportSync();
-  });
-
-  const touchLayout =
-    typeof window !== "undefined" &&
-    window.matchMedia("(max-width: 1024px) and (pointer: coarse)").matches;
+  canvas.addEventListener("pointerdown", () => canvas.focus());
+  requestAnimationFrame(() => canvas.focus());
 
   const k: KAPLAYCtx = kaplay({
     canvas,
@@ -322,20 +249,13 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     crisp: true,
     pixelDensity: 1,
     stretch: true,
-    // Keep the fixed 16:9 letterbox only on touch layouts. Desktop uses the
-    // full stage without the extra viewport transform, which avoids stale
-    // backbuffer/camera state after wide-screen resize or fullscreen restore.
-    letterbox: touchLayout,
+    letterbox: true,
     debug: false,
     focus: false,
   });
 
   for (const [name, src] of Object.entries(SPRITES)) k.loadSprite(name, src);
   k.loadSprite("trainer-chars", trainerOverworldAtlas, { sliceX: 4, sliceY: TRAINER_VARIANTS * 4 });
-  // Cynthia has a dedicated overworld PNG. Use it directly for the Arena judge
-  // instead of relying on the legacy characters.png atlas, whose corresponding
-  // block can differ from the intended Cynthia artwork.
-  k.loadSprite("trainer-cynthia-world", overworldCynthia);
   k.loadSprite("door-modern", doorModernSprite);
   k.loadSprite("door-wood", doorWoodSprite);
   k.loadSprite("terrain-sand", desertSandTile);
@@ -379,7 +299,6 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   const waterfallVisuals: WaterfallVisual[] = [];
   const fireVisuals: FireVisual[] = [];
   let waterTick = 0;
-  const visualAnimationInterval = 1 / 15;
   let activeInteriorStyleKey: Exclude<SceneId, "city"> = "home";
 
   const INTERIOR_STYLES: Record<
@@ -1030,7 +949,6 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   interface ActiveNpc {
     item: Interactable;
     trainerVariant: number;
-    standaloneWorldSprite: boolean;
     facing: Dir;
     homeCol: number;
     homeRow: number;
@@ -1351,7 +1269,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
   function makePlayer(pos: { x: number; y: number }, initialFacing: Dir = "down") {
     const p = k.add([
-      k.sprite("trainer-chars", { frame: 0 }),
+      k.sprite("trainer-chars", { frame: trainerFrame(PLAYER_TRAINER_VARIANT, initialFacing, 0) }),
       k.pos(pos.x * TILE + TILE / 2, pos.y * TILE + TILE),
       k.anchor("bot"),
       k.scale(1.0),
@@ -1359,7 +1277,6 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       { facing: initialFacing, step: 0, walkAnimTime: 0 },
       "player",
     ]);
-    applySafeTrainerFrame(p, trainerFrame(PLAYER_TRAINER_VARIANT, initialFacing, 0));
     return p;
   }
 
@@ -1423,7 +1340,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   // Water still animates, but at a capped 30 FPS to keep the overworld responsive.
   k.onUpdate(() => {
     waterTick += k.dt();
-    if (waterTick < (touchLayout ? visualAnimationInterval : 1 / 24)) return;
+    if (waterTick < 1 / 24) return;
     waterTick = 0;
     const time = k.time();
     for (const visual of waterVisuals) {
@@ -1487,25 +1404,6 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     const movementBlocked = (col: number, row: number) => {
       if (col < 0 || row < 0 || col >= mapW || row >= mapH) return true;
       return blockedCells[row * mapW + col] === 1;
-    };
-
-    // NPC/Pokémon roaming uses a stricter footprint than the player. Precompute
-    // it once per scene so mobile devices never scan every building during AI.
-    const roamingBlockedCells = new Uint8Array(mapW * mapH);
-    if (!scene.indoor) {
-      for (let row = 0; row < mapH; row++) {
-        for (let col = 0; col < mapW; col++) {
-          roamingBlockedCells[row * mapW + col] =
-            isRoamingBlocked(scene, rows, col, row) ? 1 : 0;
-        }
-      }
-    } else {
-      roamingBlockedCells.set(blockedCells);
-    }
-
-    const roamingBlocked = (col: number, row: number) => {
-      if (col < 0 || row < 0 || col >= mapW || row >= mapH) return true;
-      return roamingBlockedCells[row * mapW + col] === 1;
     };
 
     for (let row = 0; row < mapH; row++) {
@@ -1724,9 +1622,6 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     const activeNpcs: ActiveNpc[] = [];
     for (const item of npcInteractables) {
       const trainerVariant = npcTrainerVariant(item.npc ?? 0, item.label);
-      // Cynthia uses her dedicated standalone overworld artwork in the Arena.
-      const standaloneWorldSprite =
-        item.label === "Juíza da Arena" || item.label === "Juíza" || item.label === "Cynthia";
       const face = item.face ?? "down";
       const isNurseJoy = item.label === "Enfermeira Joy";
       const px = item.x * TILE + TILE / 2;
@@ -1745,21 +1640,16 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       // One visual instance only: using two overlapping sprites caused the
       // old walking/idle switch to leave a visible duplicate or halo.
       const spr = k.add([
-        k.sprite(standaloneWorldSprite ? "trainer-cynthia-world" : "trainer-chars", {
+        k.sprite("trainer-chars", {
           // Nurse Joy is the Dawn block from characters.png: position 6 (index 5).
-          // Start at frame 0; the actual frame is clamped against the loaded atlas below.
-          frame: 0,
+          frame: trainerFrame(isNurseJoy ? 5 : trainerVariant, isNurseJoy ? "down" : face, 0),
         }),
         k.pos(px, py),
         k.anchor("bot"),
         k.scale(1),
         k.opacity(1),
         k.z(20),
-      ]) as unknown as { frame: number; numFrames?: () => number; pos: { x: number; y: number }; opacity: number; z: number };
-
-      if (!standaloneWorldSprite) {
-        applySafeTrainerFrame(spr, trainerFrame(isNurseJoy ? 5 : trainerVariant, isNurseJoy ? "down" : face, 0));
-      }
+      ]) as unknown as { frame?: number; pos: { x: number; y: number }; opacity: number; z: number };
 
       const emote = k.add([
         k.text("❤️", { size: 9 }),
@@ -1772,7 +1662,6 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       activeNpcs.push({
         item,
         trainerVariant,
-        standaloneWorldSprite,
         facing: face,
         homeCol: item.x,
         homeRow: item.y,
@@ -1816,31 +1705,18 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
     ]) as unknown as { pos: { x: number; y: number } };
 
     const SPEED = 120;
-    const aiInterval = touchLayout ? 1 / 12 : 1 / 20;
-    const depthInterval = touchLayout ? 1 / 20 : 1 / 30;
-    const activeRadiusTiles = touchLayout ? 12 : Number.POSITIVE_INFINITY;
-    let aiTick = 0;
-    let depthTick = 0;
-    const pokemonOccupancy = new Set<string>();
-    const npcOccupancy = new Set<string>();
 
     k.onUpdate(() => {
       const dt = k.dt();
       const now = k.time();
-      aiTick += dt;
-      depthTick += dt;
-      const runAiStep = aiTick >= aiInterval;
-      if (runAiStep) aiTick -= aiInterval;
       // Keep player shadow aligned under feet
       setPosX(playerShadow, player.pos.x);
       setPosY(playerShadow, player.pos.y - 2);
 
       // Dynamic Y-depth sorting so characters and player never clip through roofs, walls or each other
-      if (depthTick >= depthInterval) {
-        depthTick -= depthInterval;
-        player.z = 20 + Math.floor(player.pos.y / 8);
-        for (const npc of activeNpcs) npc.spr.z = 20 + Math.floor(npc.spr.pos.y / 8);
-        for (const p of activePokemon) p.spr.z = 20 + Math.floor(p.spr.pos.y / 8);
+      player.z = 20 + Math.floor(player.pos.y / 8);
+      for (const npc of activeNpcs) {
+        npc.spr.z = 20 + Math.floor(npc.spr.pos.y / 8);
       }
 
       // Doors slide open smoothly when near
@@ -1852,27 +1728,14 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         d.apply(d.open);
       }
 
-      if (runAiStep) {
-        pokemonOccupancy.clear();
-        for (const other of activePokemon) pokemonOccupancy.add(other.curCol + "," + other.curRow);
-        npcOccupancy.clear();
-        for (const other of activeNpcs) {
-          npcOccupancy.add(other.curCol + "," + other.curRow);
-          if (other.state === "walking") npcOccupancy.add(Math.round((other.targetX - TILE / 2) / TILE) + "," + Math.round((other.targetY - (TILE - 2)) / TILE));
-        }
-      }
-
       // Update active roaming Pokémon with walking and trot animations
       for (const p of activePokemon) {
         if (state.paused || p.state === "talking") continue;
-        const pDistance = Math.max(Math.abs(p.curCol - Math.floor(player.pos.x / TILE)), Math.abs(p.curRow - Math.floor(player.pos.y / TILE)));
-        if (touchLayout && pDistance > activeRadiusTiles && p.state === "idle") continue;
 
         p.spr.z = 20 + Math.floor(p.spr.pos.y / 8);
 
         if (p.state === "idle") {
-          if (!runAiStep) continue;
-          p.idleTimer -= aiInterval;
+          p.idleTimer -= dt;
           // Gentle breathing idle
           const t = now;
           setScaleY(p.spr, p.baseScale + Math.sin(t * 3.5 + p.curCol) * 0.04);
@@ -1895,19 +1758,20 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
                 [0, 1],
                 [0, -1],
               ];
-              const candidates = dirs
-                .map(([dx, dy]) => ({ dx, dy, col: p.curCol + dx, row: p.curRow + dy }))
-                .filter(({ col, row }) => {
-                  const dist = Math.hypot(col - p.homeCol, row - p.homeRow);
-                  return dist <= 1.8 && !roamingBlocked(col, row);
-                })
-                .filter(({ col, row }) => !pokemonOccupancy.has(col + "," + row));
-              const candidate = candidates.length
-                ? candidates[Math.floor(Math.random() * candidates.length)]!
-                : null;
+              const [dx, dy] = dirs[Math.floor(Math.random() * dirs.length)]!;
+              const nextCol = p.curCol + dx;
+              const nextRow = p.curRow + dy;
+              const distFromHome = Math.hypot(nextCol - p.homeCol, nextRow - p.homeRow);
 
-              if (candidate) {
-                const { dx, dy, col: nextCol, row: nextRow } = candidate;
+              const occupiedByOtherPokemon = activePokemon.some(
+                (other) => other !== p && other.curCol === nextCol && other.curRow === nextRow,
+              );
+
+              if (
+                distFromHome <= 1.8 &&
+                !isRoamingBlocked(nextCol, nextRow) &&
+                !occupiedByOtherPokemon
+              ) {
                 p.state = "walking";
                 p.facing = dx < 0 ? "left" : dx > 0 ? "right" : dy < 0 ? "up" : "down";
                 // Apply lateral flip immediately so a leftward walk never starts
@@ -1954,15 +1818,12 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       // Update active NPCs with authentic Pokemon movement AI
       for (const npc of activeNpcs) {
         if (state.paused || npc.state === "talking") continue;
-        const npcDistance = Math.max(Math.abs(npc.curCol - Math.floor(player.pos.x / TILE)), Math.abs(npc.curRow - Math.floor(player.pos.y / TILE)));
-        if (touchLayout && npcDistance > activeRadiusTiles && npc.state === "idle") continue;
 
         // Nurse Joy uses the actual Dawn overworld block from characters.png:
         // the 6th physical block (zero-based index 5), not the yellow-hat block at index 4.
         if (npc.item.label === "Enfermeira Joy") continue;
 
         if (npc.state === "idle") {
-          if (!runAiStep) continue;
           // Subtle breathing/bobbing keeps stationary trainers from looking frozen.
           // It is intentionally tiny so the pixel-art silhouette stays stable.
           const idleBob = Math.sin(now * 3.2 + npc.homeCol * 0.7 + npc.homeRow * 0.4) * 0.45;
@@ -1970,44 +1831,47 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           setPosY(npc.shadow, npc.curRow * TILE + TILE - 2);
           // Idle sprites only change frame when direction/state changes. Rewriting
           // the frame and opacity every animation tick created unnecessary work.
-          npc.idleTimer -= aiInterval;
+          npc.idleTimer -= dt;
 
           if (npc.idleTimer <= 0) {
             const dirs: Dir[] = ["down", "left", "right", "up"];
             if (!npc.canWander || Math.random() < 0.25) {
               // Turn first, then resolve the correct row in the trainer atlas.
               npc.facing = dirs[Math.floor(Math.random() * dirs.length)]!;
-              applySafeTrainerFrame(npc.spr, npc.standaloneWorldSprite ? 0 : trainerFrame(npc.trainerVariant, npc.facing, 0));
+              npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, 0);
               npc.idleTimer = 0.7 + Math.random() * 1.1;
             } else {
               // Choose a step to walk
-              const candidates = dirs
-                .map((pickDir) => ({
-                  pickDir,
-                  col: npc.curCol + (pickDir === "right" ? 1 : pickDir === "left" ? -1 : 0),
-                  row: npc.curRow + (pickDir === "down" ? 1 : pickDir === "up" ? -1 : 0),
-                }))
-                .filter(({ col, row }) => {
-                  const dist = Math.hypot(col - npc.homeCol, row - npc.homeRow);
-                  return dist <= 2.2 && !roamingBlocked(col, row);
-                })
-                .filter(({ col, row }) => {
-                  const pTileX = Math.floor(player.pos.x / TILE);
-                  const pTileY = Math.floor(player.pos.y / TILE);
-                  if (col === pTileX && row === pTileY) return false;
-                  return !npcOccupancy.has(col + "," + row);
-                });
-              const candidate = candidates.length
-                ? candidates[Math.floor(Math.random() * candidates.length)]!
-                : null;
+              const pickDir = dirs[Math.floor(Math.random() * dirs.length)]!;
+              const deltaX = pickDir === "right" ? 1 : pickDir === "left" ? -1 : 0;
+              const deltaY = pickDir === "down" ? 1 : pickDir === "up" ? -1 : 0;
+              const nextCol = npc.curCol + deltaX;
+              const nextRow = npc.curRow + deltaY;
 
-              if (candidate) {
-                const { pickDir, col: nextCol, row: nextRow } = candidate;
+              const distFromHome = Math.hypot(nextCol - npc.homeCol, nextRow - npc.homeRow);
+              const pTileX = Math.floor(player.pos.x / TILE);
+              const pTileY = Math.floor(player.pos.y / TILE);
+              const nearPlayer = nextCol === pTileX && nextRow === pTileY;
+              const occupiedByOther = activeNpcs.some(
+                (other) =>
+                  other !== npc &&
+                  ((other.curCol === nextCol && other.curRow === nextRow) ||
+                    (other.state === "walking" &&
+                      Math.round((other.targetX - TILE / 2) / TILE) === nextCol &&
+                      Math.round((other.targetY - (TILE - 2)) / TILE) === nextRow)),
+              );
+
+              if (
+                distFromHome <= 2.2 &&
+                !isRoamingBlocked(nextCol, nextRow) &&
+                !nearPlayer &&
+                !occupiedByOther
+              ) {
                 npc.state = "walking";
                 npc.facing = pickDir;
                 // Set the direction frame immediately, so the first walking tick
                 // cannot briefly show the previous direction.
-                applySafeTrainerFrame(npc.spr, npc.standaloneWorldSprite ? 0 : trainerFrame(npc.trainerVariant, npc.facing, 0));
+                npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, 0);
                 npc.walkProgress = 0;
                 npc.walkAnimTime = 0;
                 npc.walkStep = 0;
@@ -2028,7 +1892,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           // Use a fixed animation clock so every direction, especially up/down,
           // begins stepping on the first rendered frames of the movement.
           const walkFrame = Math.floor(npc.walkAnimTime * WALK_ANIMATION_FPS) % 4;
-          applySafeTrainerFrame(npc.spr, npc.standaloneWorldSprite ? 0 : trainerFrame(npc.trainerVariant, npc.facing, walkFrame));
+          npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, walkFrame);
           npc.spr.opacity = 1;
           const stepPhase = walkFrame;
 
@@ -2050,7 +1914,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
             npc.item.y = npc.curRow;
             npc.state = "idle";
             npc.walkAnimTime = 0;
-            applySafeTrainerFrame(npc.spr, trainerFrame(npc.trainerVariant, npc.facing, 0));
+            npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, 0);
             npc.spr.opacity = 1;
             setPosY(npc.spr, curPy);
             npc.idleTimer = 1.8 + Math.random() * 2.5;
@@ -2125,16 +1989,16 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
           player.walkAnimTime += k.dt();
           const walkFrame = Math.floor(player.walkAnimTime * WALK_ANIMATION_FPS) % 4;
           player.step = walkFrame;
-          applySafeTrainerFrame(player, trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, walkFrame));
+          player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, walkFrame);
         } else {
           player.walkAnimTime = 0;
           player.step = 0;
-          applySafeTrainerFrame(player, trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, 0));
+          player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, 0);
         }
       } else {
         player.walkAnimTime = 0;
         player.step = 0;
-        applySafeTrainerFrame(player, trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, 0));
+        player.frame = trainerFrame(PLAYER_TRAINER_VARIANT, player.facing, 0);
       }
 
       // Check nearest interaction or door
@@ -2210,7 +2074,10 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
                     matchedNpc.facing = diffY > 0 ? "down" : "up";
                   }
                   if (matchedNpc.item.label !== "Enfermeira Joy") {
-                    applySafeTrainerFrame(matchedNpc.spr, matchedNpc.standaloneWorldSprite ? 0 : trainerFrame(matchedNpc.trainerVariant, matchedNpc.facing));
+                    matchedNpc.spr.frame = trainerFrame(
+                      matchedNpc.trainerVariant,
+                      matchedNpc.facing,
+                    );
                   }
                   matchedNpc.emote.opacity = 1;
                   k.wait(0.8, () => {
@@ -2260,35 +2127,21 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         cb.onPrompt(best ? { label: best.label, action: best.action } : null);
       }
 
-      // Mobile-friendly camera: keep a small dead-zone around the trainer so
-      // walking does not make the whole map constantly slide. Once the player
-      // reaches the edge of that zone, the camera follows smoothly and remains
-      // clamped to the actual map bounds.
+      // Smooth follow with proper map-boundary clamping.
+      // This avoids the "camera stuck" feeling while keeping the player readable
+      // near the center and preventing the camera from exposing void space.
       const halfW = k.width() / 2;
       const halfH = k.height() / 2;
-      const deadZoneX = k.width() * (touchLayout ? 0.20 : 0.15);
-      const deadZoneY = k.height() * (touchLayout ? 0.18 : 0.14);
+      const targetCx =
+        mapW * TILE <= k.width()
+          ? (mapW * TILE) / 2
+          : Math.min(Math.max(player.pos.x, halfW), mapW * TILE - halfW);
+      const targetCy =
+        mapH * TILE <= k.height()
+          ? (mapH * TILE) / 2
+          : Math.min(Math.max(player.pos.y, halfH), mapH * TILE - halfH);
 
-      let targetCx = cameraX;
-      let targetCy = cameraY;
-      if (player.pos.x < cameraX - deadZoneX) targetCx = player.pos.x + deadZoneX;
-      if (player.pos.x > cameraX + deadZoneX) targetCx = player.pos.x - deadZoneX;
-      if (player.pos.y < cameraY - deadZoneY) targetCy = player.pos.y + deadZoneY;
-      if (player.pos.y > cameraY + deadZoneY) targetCy = player.pos.y - deadZoneY;
-
-      if (mapW * TILE <= k.width()) {
-        targetCx = (mapW * TILE) / 2;
-      } else {
-        targetCx = Math.min(Math.max(targetCx, halfW), mapW * TILE - halfW);
-      }
-
-      if (mapH * TILE <= k.height()) {
-        targetCy = (mapH * TILE) / 2;
-      } else {
-        targetCy = Math.min(Math.max(targetCy, halfH), mapH * TILE - halfH);
-      }
-
-      const follow = Math.min(1, k.dt() * (touchLayout ? 14 : 12));
+      const follow = Math.min(1, k.dt() * 12);
       cameraX += (targetCx - cameraX) * follow;
       cameraY += (targetCy - cameraY) * follow;
       k.setCamPos(Math.round(cameraX), Math.round(cameraY));
@@ -2304,7 +2157,6 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
 
   function goTo(id: SceneId) {
     if (state.transitioning) return;
-    const previousSceneId = currentSceneId;
     state.transitioning = true;
     state.dir = null;
     state.lastPromptKey = "";
@@ -2318,7 +2170,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         doorObj.apply(1);
         if (activePlayer) {
           activePlayer.facing = "up";
-          applySafeTrainerFrame(activePlayer, trainerFrame(PLAYER_TRAINER_VARIANT, "up", 0));
+          activePlayer.frame = trainerFrame(PLAYER_TRAINER_VARIANT, "up", 0);
           setPosX(activePlayer, doorObj.x * TILE + TILE / 2);
           setPosY(activePlayer, doorObj.y * TILE + 2);
         }
@@ -2355,19 +2207,8 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       type: currentTransitionType,
       origin,
       onMidpoint: () => {
-        try {
-          currentSceneId = id;
-          k.go("play", { id, spawn, initialFacing });
-        } catch (error) {
-          console.error("Failed to enter scene:", id, error);
-          currentSceneId = previousSceneId;
-          try {
-            const previousScene = SCENES[previousSceneId];
-            k.go("play", { id: previousSceneId, spawn: previousScene.spawn, initialFacing: previousSceneId === "city" ? "down" : "up" });
-          } catch (restoreError) {
-            console.error("Failed to restore previous scene:", restoreError);
-          }
-        }
+        currentSceneId = id;
+        k.go("play", { id, spawn, initialFacing });
       },
       getNewOrigin: () => {
         try {
@@ -2381,21 +2222,13 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
       },
       onComplete: () => {
         state.transitioning = false;
-        state.dir = null;
-        state.lastPromptKey = "";
-        cb.onPrompt(null);
-        cb.onTransitionComplete?.(SCENES[currentSceneId]);
+        cb.onTransitionComplete?.(target);
       },
     });
   }
 
-  let lastInteractAt = 0;
-
   function triggerInteract() {
     if (state.paused || state.transitioning) return;
-    const now = performance.now();
-    if (now - lastInteractAt < 180) return;
-    lastInteractAt = now;
     state.interact?.();
   }
 
@@ -2411,14 +2244,6 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
   return {
     destroy: () => {
       transitionManager.destroy();
-      resizeObserver?.disconnect();
-      cancelAnimationFrame(resizeFrame);
-      if (viewportSyncTimer) clearTimeout(viewportSyncTimer);
-      window.removeEventListener("resize", handleWindowResize);
-      window.removeEventListener("orientationchange", scheduleViewportSync);
-      window.removeEventListener("fullscreenchange", scheduleViewportSync);
-      window.removeEventListener("pageshow", scheduleViewportSync);
-      document.removeEventListener("visibilitychange", scheduleViewportSync);
       k.quit();
       canvas.remove();
     },
@@ -2431,7 +2256,7 @@ export function createGame(root: HTMLElement, cb: GameCallbacks): GameHandle {
         for (const npc of currentActiveNpcs) {
           if (npc.state === "talking") {
             npc.state = "idle";
-            applySafeTrainerFrame(npc.spr, trainerFrame(npc.trainerVariant, npc.facing, 0));
+            npc.spr.frame = trainerFrame(npc.trainerVariant, npc.facing, 0);
             npc.spr.opacity = 1;
             npc.walkAnimTime = 0;
             npc.idleTimer = 2.0 + Math.random() * 2.0;

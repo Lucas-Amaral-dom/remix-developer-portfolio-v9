@@ -28,7 +28,7 @@ export class TransitionManager {
   private activeType: TransitionType = "iris";
   public isRunning: boolean = false;
 
-  constructor(container: HTMLElement, width = 960, height = 540) {
+  constructor(container: HTMLElement, width = 960, height = 704) {
     this.canvas = document.createElement("canvas");
     this.canvas.width = width;
     this.canvas.height = height;
@@ -54,13 +54,13 @@ export class TransitionManager {
   }
 
   public runTransition(opts: TransitionOptions) {
-    if (this.isRunning) this.cancel();
     if (!this.ctx) {
       opts.onMidpoint();
       opts.onComplete();
       return;
     }
 
+    this.cancel();
     this.isRunning = true;
 
     const ctx = this.ctx;
@@ -99,7 +99,10 @@ export class TransitionManager {
             }
           } catch (error) {
             console.error("Scene transition failed:", error);
-            this.cancel();
+            // Abort the visual transition instead of freezing on a black frame.
+            this.isRunning = false;
+            this.animId = null;
+            ctx.clearRect(0, 0, w, h);
             opts.onComplete();
             return;
           }

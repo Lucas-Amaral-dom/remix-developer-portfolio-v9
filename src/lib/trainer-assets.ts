@@ -114,8 +114,6 @@ export const TRAINER_VARIANT_BY_ID: Record<string, number> = {
   "Curador de Créditos": TRAINER_ATLAS_VARIANT_BY_NAME.Calem,
   "Pesquisador do Oásis": TRAINER_ATLAS_VARIANT_BY_NAME.Hilbert,
 
-  // Arena master: use Cynthia in the overworld and in dialogue/battle.
-  // The NPC identity stays "Juíza da Arena"; only its trainer sprite changes.
   "Juíza da Arena": TRAINER_ATLAS_VARIANT_BY_NAME.Cynthia,
   Juíza: TRAINER_ATLAS_VARIANT_BY_NAME.Cynthia,
   Cynthia: TRAINER_ATLAS_VARIANT_BY_NAME.Cynthia,
